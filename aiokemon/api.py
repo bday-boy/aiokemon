@@ -81,7 +81,7 @@ class APIMetaData:
         if getattr(self, 'url', False):
             endpoint, resource = cmn.break_url(self.url)
             print(endpoint, resource)
-            return await new_resource(endpoint, resource)
+            return await get_resource(endpoint, resource)
         else:
             return None
 
@@ -111,18 +111,18 @@ def sanitize_data(data: dict) -> dict:
     return sanitized_data
 
 
-async def new_resource(endpoint: str, resource: Resource) -> APIResource:
+async def get_resource(endpoint: str, resource: Resource) -> APIResource:
     """Async wrapper function for creating a new resource class."""
     apiresource = APIResource(endpoint, resource, loop)
     await apiresource._load()
     return apiresource
 
 
-async def main():
-    p = await new_resource('pokemon', 'breloom')
+async def test():
+    p = await get_resource('pokemon', 'breloom')
     print(p.name)
     print(p.abilities[0].ability.name)
 
 
 if __name__ == '__main__':
-    loop.run_until_complete(main())
+    loop.run_until_complete(test())
