@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from aiokemon.api import APIResource
+from aiokemon.api import get_resource
 from aiokemon.common import Resource
 
 
@@ -10,7 +10,7 @@ async def berry(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#berries for attributes and more detailed
     information.
     """
-    return APIResource("berry", resource, **kwargs)
+    return await get_resource("berry", resource, **kwargs)
 
 
 async def berry_firmness(resource: Resource, **kwargs):
@@ -19,7 +19,7 @@ async def berry_firmness(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#berry-firmnesses for attributes and more
     detailed information.
     """
-    return APIResource("berry-firmness", resource, **kwargs)
+    return await get_resource("berry-firmness", resource, **kwargs)
 
 
 async def berry_flavor(resource: Resource, **kwargs):
@@ -28,7 +28,7 @@ async def berry_flavor(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#berry-flavors for attributes and more
     detailed information.
     """
-    return APIResource("berry-flavor", resource, **kwargs)
+    return await get_resource("berry-flavor", resource, **kwargs)
 
 
 async def contest_type(resource: Resource, **kwargs):
@@ -37,7 +37,7 @@ async def contest_type(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#contest-types for attributes and more
     detailed information.
     """
-    return APIResource("contest-type", resource, **kwargs)
+    return await get_resource("contest-type", resource, **kwargs)
 
 
 async def contest_effect(id_: int, **kwargs):
@@ -46,7 +46,7 @@ async def contest_effect(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#contest-effects for attributes and more
     detailed information.
     """
-    return APIResource("contest-effect", id_, **kwargs)
+    return await get_resource("contest-effect", id_, **kwargs)
 
 
 async def super_contest_effect(id_: int, **kwargs):
@@ -55,7 +55,7 @@ async def super_contest_effect(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#super-contest-effects for attributes and
     more detailed information.
     """
-    return APIResource("super-contest-effect", id_, **kwargs)
+    return await get_resource("super-contest-effect", id_, **kwargs)
 
 
 async def encounter_method(resource: Resource, **kwargs):
@@ -64,7 +64,7 @@ async def encounter_method(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#encounter-methods for attributes and more
     detailed information.
     """
-    return APIResource("encounter-method", resource, **kwargs)
+    return await get_resource("encounter-method", resource, **kwargs)
 
 
 async def encounter_condition(resource: Resource, **kwargs):
@@ -73,7 +73,7 @@ async def encounter_condition(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#encounter-conditions for attributes and more
     detailed information.
     """
-    return APIResource("encounter-condition", resource, **kwargs)
+    return await get_resource("encounter-condition", resource, **kwargs)
 
 
 async def encounter_condition_value(resource: Resource, **kwargs):
@@ -82,7 +82,7 @@ async def encounter_condition_value(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#encounter-condition-values for attributes
     and more detailed information.
     """
-    return APIResource("encounter-condition-value", resource, **kwargs)
+    return await get_resource("encounter-condition-value", resource, **kwargs)
 
 
 async def evolution_chain(id_: int, **kwargs):
@@ -91,7 +91,7 @@ async def evolution_chain(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#evolution-chains for attributes and more
     detailed information.
     """
-    return APIResource("evolution-chain", id_, **kwargs)
+    return await get_resource("evolution-chain", id_, **kwargs)
 
 
 async def evolution_trigger(resource: Resource, **kwargs):
@@ -100,7 +100,7 @@ async def evolution_trigger(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#evolution-triggers for attributes and more
     detailed information.
     """
-    return APIResource("evolution-trigger", resource, **kwargs)
+    return await get_resource("evolution-trigger", resource, **kwargs)
 
 
 async def generation(resource: Resource, **kwargs):
@@ -109,7 +109,7 @@ async def generation(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#generations for attributes and more detailed
     information.
     """
-    return APIResource("generation", resource, **kwargs)
+    return await get_resource("generation", resource, **kwargs)
 
 
 async def pokedex(resource: Resource, **kwargs):
@@ -118,7 +118,7 @@ async def pokedex(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokedexes for attributes and more detailed
     information.
     """
-    return APIResource("pokedex", resource, **kwargs)
+    return await get_resource("pokedex", resource, **kwargs)
 
 
 async def version(resource: Resource, **kwargs):
@@ -127,7 +127,7 @@ async def version(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#versions for attributes and more detailed
     information.
     """
-    return APIResource("version", resource, **kwargs)
+    return await get_resource("version", resource, **kwargs)
 
 
 async def version_group(resource: Resource, **kwargs):
@@ -136,7 +136,7 @@ async def version_group(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#version-groups for attributes and more
     detailed information.
     """
-    return APIResource("version-group", resource, **kwargs)
+    return await get_resource("version-group", resource, **kwargs)
 
 
 async def item(resource: Resource, **kwargs):
@@ -145,7 +145,7 @@ async def item(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#items for attributes and more detailed
     information.
     """
-    return APIResource("item", resource, **kwargs)
+    return await get_resource("item", resource, **kwargs)
 
 
 async def item_attribute(resource: Resource, **kwargs):
@@ -154,7 +154,7 @@ async def item_attribute(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#item-attributes for attributes and more
     detailed information.
     """
-    return APIResource("item-attribute", resource, **kwargs)
+    return await get_resource("item-attribute", resource, **kwargs)
 
 
 async def item_category(resource: Resource, **kwargs):
@@ -163,7 +163,7 @@ async def item_category(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#item-categories for attributes and more
     detailed information.
     """
-    return APIResource("item-category", resource, **kwargs)
+    return await get_resource("item-category", resource, **kwargs)
 
 
 async def item_fling_effect(resource: Resource, **kwargs):
@@ -172,7 +172,7 @@ async def item_fling_effect(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#item-fling-effects for attributes and more
     detailed information.
     """
-    return APIResource("item-fling-effect", resource, **kwargs)
+    return await get_resource("item-fling-effect", resource, **kwargs)
 
 
 async def item_pocket(resource: Resource, **kwargs):
@@ -181,7 +181,7 @@ async def item_pocket(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#item-pockets for attributes and more
     detailed information.
     """
-    return APIResource("item-pocket", resource, **kwargs)
+    return await get_resource("item-pocket", resource, **kwargs)
 
 
 async def machine(id_: int, **kwargs):
@@ -190,7 +190,7 @@ async def machine(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#machines for attributes and more detailed
     information.
     """
-    return APIResource("machine", id_, **kwargs)
+    return await get_resource("machine", id_, **kwargs)
 
 
 async def move(resource: Resource, **kwargs):
@@ -199,7 +199,7 @@ async def move(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#moves for attributes and more detailed
     information.
     """
-    return APIResource("move", resource, **kwargs)
+    return await get_resource("move", resource, **kwargs)
 
 
 async def move_ailment(resource: Resource, **kwargs):
@@ -208,7 +208,7 @@ async def move_ailment(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#move-ailments for attributes and more
     detailed information.
     """
-    return APIResource("move-ailment", resource, **kwargs)
+    return await get_resource("move-ailment", resource, **kwargs)
 
 
 async def move_battle_style(resource: Resource, **kwargs):
@@ -217,7 +217,7 @@ async def move_battle_style(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#move-battle-styles for attributes and more
     detailed information.
     """
-    return APIResource("move-battle-style", resource, **kwargs)
+    return await get_resource("move-battle-style", resource, **kwargs)
 
 
 async def move_category(resource: Resource, **kwargs):
@@ -226,7 +226,7 @@ async def move_category(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#move-categories for attributes and more
     detailed information.
     """
-    return APIResource("move-category", resource, **kwargs)
+    return await get_resource("move-category", resource, **kwargs)
 
 
 async def move_damage_class(resource: Resource, **kwargs):
@@ -235,7 +235,7 @@ async def move_damage_class(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#move-damage-classes for attributes and more
     detailed information.
     """
-    return APIResource("move-damage-class", resource, **kwargs)
+    return await get_resource("move-damage-class", resource, **kwargs)
 
 
 async def move_learn_method(resource: Resource, **kwargs):
@@ -244,7 +244,7 @@ async def move_learn_method(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#move-learn-methods for attributes and more
     detailed information.
     """
-    return APIResource("move-learn-method", resource, **kwargs)
+    return await get_resource("move-learn-method", resource, **kwargs)
 
 
 async def move_target(resource: Resource, **kwargs):
@@ -253,7 +253,7 @@ async def move_target(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#move-targets for attributes and more
     detailed information.
     """
-    return APIResource("move-target", resource, **kwargs)
+    return await get_resource("move-target", resource, **kwargs)
 
 
 async def location(id_: int, **kwargs):
@@ -262,7 +262,7 @@ async def location(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#locations for attributes and more detailed
     information.
     """
-    return APIResource("location", id_, **kwargs)
+    return await get_resource("location", id_, **kwargs)
 
 
 async def location_area(id_: int, **kwargs):
@@ -271,7 +271,7 @@ async def location_area(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#location-areas for attributes and more
     detailed information.
     """
-    return APIResource("location-area", id_, **kwargs)
+    return await get_resource("location-area", id_, **kwargs)
 
 
 async def pal_park_area(resource: Resource, **kwargs):
@@ -280,7 +280,7 @@ async def pal_park_area(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pal-park-areas for attributes and more
     detailed information.
     """
-    return APIResource("pal-park-area", resource, **kwargs)
+    return await get_resource("pal-park-area", resource, **kwargs)
 
 
 async def region(resource: Resource, **kwargs):
@@ -289,7 +289,7 @@ async def region(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#regions for attributes and more detailed
     information.
     """
-    return APIResource("region", resource, **kwargs)
+    return await get_resource("region", resource, **kwargs)
 
 
 async def ability(resource: Resource, **kwargs):
@@ -298,7 +298,7 @@ async def ability(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#abilities for attributes and more detailed
     information.
     """
-    return APIResource("ability", resource, **kwargs)
+    return await get_resource("ability", resource, **kwargs)
 
 
 async def characteristic(id_: int, **kwargs):
@@ -307,7 +307,7 @@ async def characteristic(id_: int, **kwargs):
     See https://pokeapi.co/docsv2/#characteristics for attributes and more
     detailed information.
     """
-    return APIResource("characteristic", id_, **kwargs)
+    return await get_resource("characteristic", id_, **kwargs)
 
 
 async def egg_group(resource: Resource, **kwargs):
@@ -316,7 +316,7 @@ async def egg_group(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#egg-groups for attributes and more detailed
     information.
     """
-    return APIResource("egg-group", resource, **kwargs)
+    return await get_resource("egg-group", resource, **kwargs)
 
 
 async def gender(resource: Resource, **kwargs):
@@ -325,7 +325,7 @@ async def gender(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#genders for attributes and more detailed
     information.
     """
-    return APIResource("gender", resource, **kwargs)
+    return await get_resource("gender", resource, **kwargs)
 
 
 async def growth_rate(resource: Resource, **kwargs):
@@ -334,7 +334,7 @@ async def growth_rate(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#growth-rates for attributes and more
     detailed information.
     """
-    return APIResource("growth-rate", resource, **kwargs)
+    return await get_resource("growth-rate", resource, **kwargs)
 
 
 async def nature(resource: Resource, **kwargs):
@@ -343,7 +343,7 @@ async def nature(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#natures for attributes and more detailed
     information.
     """
-    return APIResource("nature", resource, **kwargs)
+    return await get_resource("nature", resource, **kwargs)
 
 
 async def pokeathlon_stat(resource: Resource, **kwargs):
@@ -352,7 +352,7 @@ async def pokeathlon_stat(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokeathlon-stats for attributes and more
     detailed information.
     """
-    return APIResource("pokeathlon-stat", resource, **kwargs)
+    return await get_resource("pokeathlon-stat", resource, **kwargs)
 
 
 async def pokemon(resource: Resource, **kwargs):
@@ -361,7 +361,7 @@ async def pokemon(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon for attributes and more detailed
     information.
     """
-    return APIResource("pokemon", resource, **kwargs)
+    return await get_resource("pokemon", resource, **kwargs)
 
 
 async def pokemon_color(resource: Resource, **kwargs):
@@ -370,7 +370,7 @@ async def pokemon_color(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon-colors for attributes and more
     detailed information.
     """
-    return APIResource("pokemon-color", resource, **kwargs)
+    return await get_resource("pokemon-color", resource, **kwargs)
 
 
 async def pokemon_form(resource: Resource, **kwargs):
@@ -379,7 +379,7 @@ async def pokemon_form(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon-forms for attributes and more
     detailed information.
     """
-    return APIResource("pokemon-form", resource, **kwargs)
+    return await get_resource("pokemon-form", resource, **kwargs)
 
 
 async def pokemon_habitat(resource: Resource, **kwargs):
@@ -388,7 +388,7 @@ async def pokemon_habitat(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon-habitats for attributes and more
     detailed information.
     """
-    return APIResource("pokemon-habitat", resource, **kwargs)
+    return await get_resource("pokemon-habitat", resource, **kwargs)
 
 
 async def pokemon_shape(resource: Resource, **kwargs):
@@ -397,7 +397,7 @@ async def pokemon_shape(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon-shapes for attributes and more
     detailed information.
     """
-    return APIResource("pokemon-shape", resource, **kwargs)
+    return await get_resource("pokemon-shape", resource, **kwargs)
 
 
 async def pokemon_species(resource: Resource, **kwargs):
@@ -407,7 +407,7 @@ async def pokemon_species(resource: Resource, **kwargs):
     detailed information.
     """
 
-    return APIResource("pokemon-species", resource, **kwargs)
+    return await get_resource("pokemon-species", resource, **kwargs)
 
 
 async def stat(resource: Resource, **kwargs):
@@ -416,7 +416,7 @@ async def stat(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#stats for attributes and more detailed
     information.
     """
-    return APIResource("stat", resource, **kwargs)
+    return await get_resource("stat", resource, **kwargs)
 
 
 async def type_(resource: Resource, **kwargs):
@@ -425,7 +425,7 @@ async def type_(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#types for attributes and more detailed
     information.
     """
-    return APIResource("type", resource, **kwargs)
+    return await get_resource("type", resource, **kwargs)
 
 
 async def language(resource: Resource, **kwargs):
@@ -434,4 +434,4 @@ async def language(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#languages for attributes and more detailed
     information.
     """
-    return APIResource("language", resource, **kwargs)
+    return await get_resource("language", resource, **kwargs)
