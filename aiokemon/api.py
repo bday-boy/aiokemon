@@ -1,15 +1,11 @@
 import asyncio
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 import aiokemon.common as cmn
 import aiokemon.resourcematcher as matcher
 from aiokemon.common import Resource
 
 FIND_MATCH = True
-
-
-class APIResource:
-    """Forward declaration of APIResource for type hinting purposes."""
 
 
 class APIResource:
@@ -46,7 +42,11 @@ class APIResource:
     def __repr__(self) -> str:
         return f'<{self._endpoint}-{self._resource}>'
 
-    async def _load(self) -> APIResource:
+    @property
+    def attrs(self) -> List[str]:
+        return [k for k in dir(self) if not k.startswith('_')]
+
+    async def _load(self) -> None:
         """Asynchronously loads the information for the given resource
         in-place and returns a reference to itself.
         """
@@ -68,26 +68,43 @@ class APIResource:
 class APIMetaData:
     """More simple class for when data doesn't need to be loaded."""
 
-    def __init__(self, data: dict) -> None:
+    def __init__(self, key: str, data: dict) -> None:
+        self._key = key
         sanitized_data = sanitize_data(data)
         cmn.set_safe_attrs(self, **sanitized_data)
 
-    async def as_resource(self) -> APIResource:
+    def __str__(self) -> str:
+        return self._key
+
+    def __repr__(self) -> str:
+        return f'<APIMetaData object for key "{self._key}">'
+
+    @property
+    def attrs(self) -> List[str]:
+        return [k for k in dir(self) if not k.startswith('_')]
+
+    async def as_resource(self, raise_error: bool = False,
+                          **kwargs) -> APIResource:
         """Creates a new APIResource based on the URL from this class."""
         if getattr(self, 'url', False):
             endpoint, resource = cmn.break_url(self.url)
             print(endpoint, resource)
-            return await get_resource(endpoint, resource)
+            return await get_resource(endpoint, resource, **kwargs)
+        elif raise_error:
+            raise AttributeError(
+                f'object {repr(self)} has no attribute "url" and thus cannot'
+                'be loaded as a resource'
+            )
         else:
             return None
 
 
-def make_object(obj: Any) -> Any:
+def make_object(key: str, obj: Any) -> Any:
     """Turns a dictionary into an APIMetaData object and does nothing
     otherwise.
     """
     if isinstance(obj, dict):
-        return APIMetaData(obj)
+        return APIMetaData(key, obj)
     return obj
 
 
@@ -99,13 +116,13 @@ def sanitize_data(data: dict) -> dict:
     sanitized_data = {}
 
     for k, v in data.items():
-        sanitized_key = cmn.sanitize_attribute(k)
+        k = cmn.sanitize_attribute(k)
         if isinstance(v, dict):
-            sanitized_data[sanitized_key] = make_object(v)
+            sanitized_data[k] = make_object(k, v)
         elif isinstance(v, list):
-            sanitized_data[sanitized_key] = [make_object(v_) for v_ in v]
+            sanitized_data[k] = [make_object(k, v_) for v_ in v]
         else:
-            sanitized_data[sanitized_key] = v
+            sanitized_data[k] = v
 
     return sanitized_data
 
