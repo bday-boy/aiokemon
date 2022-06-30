@@ -2,6 +2,7 @@ import re
 from typing import Tuple
 
 import aiokemon.common as cmn
+from aiokemon.utils.text import levenshtein_osa
 
 non_alphanumerical = re.compile(r'[^a-z0-9]', re.IGNORECASE)
 endpoint_resources = {}
@@ -66,35 +67,6 @@ async def main():
     mon = input('Input something to match: ')
     match = await best_match('pokemon', mon)
     print(f'Best match: {match}')
-
-
-def levenshtein_osa(a: str, b: str) -> int:
-    """A slightly-modified version of the traditional Levenshtein algorithm
-    that considers an adjacent character swap as one operation rather than
-    two.
-    """
-    a_len = len(a)
-    b_len = len(b)
-    D = [[0] * (b_len + 1) for i in range(a_len + 1)]
-
-    for i in range(a_len + 1):
-        D[i][0] = i
-    for j in range(b_len + 1):
-        D[0][j] = j
-
-    for i in range(1, a_len + 1):
-        for j in range(1, b_len + 1):
-            cost = (a[i - 1] != b[j - 1])
-            D[i][j] = min(D[i - 1][j] + 1,          # deletion
-                          D[i][j - 1] + 1,          # insertion
-                          D[i - 1][j - 1] + cost)   # substitution
-            if (i > 1 and j > 1) and (a[i - 1] == b[j - 2]
-                                      and a[i - 2] == b[j - 1]):
-                D[i][j] = min(
-                    D[i][j], D[i - 2][j - 2] + 1    # adjacent transposition
-                )
-
-    return D[-1][-1], D[a_len][b_len]
 
 
 if __name__ == '__main__':
