@@ -110,9 +110,10 @@ def sanitize_data(data: dict) -> dict:
     return sanitized_data
 
 
-async def get_resource(endpoint: str, resource: Resource) -> APIResource:
+async def get_resource(endpoint: str, resource: Resource,
+                       **kwargs) -> APIResource:
     """Async wrapper function for creating a new resource class."""
-    apiresource = APIResource(endpoint, resource)
+    apiresource = APIResource(endpoint, resource, **kwargs)
     await apiresource._load()
     return apiresource
 
