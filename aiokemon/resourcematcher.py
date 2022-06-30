@@ -4,16 +4,19 @@ from typing import Tuple
 import aiokemon.common as cmn
 from aiokemon.utils.text import levenshtein_osa
 
+and_pokemon = re.compile(r'\s?(pok[eé]mon|and)\s?', re.IGNORECASE)
 non_alphanumerical = re.compile(r'[^a-z0-9]', re.IGNORECASE)
 endpoint_resources = {}
 
 
-def _get_searches(resource_attempt: str) -> Tuple[str, str]:
+def _get_searches(endpoint: str, resource_attempt: str) -> Tuple[str, str]:
     """Formats searches to fit the syntax of the endpoints.
 
     TODO: Add custom formatter for certain endpoints, like one for game
     to remove 'and'.
     """
+    if endpoint in {'version', 'version-group'}:
+        resource_attempt = and_pokemon.sub(' ', resource_attempt).strip()
     split_resource = non_alphanumerical.split(resource_attempt)
     return (
         '-'.join(split_resource), '-'.join(reversed(split_resource))
@@ -53,7 +56,7 @@ async def best_match(endpoint: str, resource_attempt: str) -> str:
         return resource_attempt
 
     matches = []
-    search_1, search_2 = _get_searches(resource_attempt)
+    search_1, search_2 = _get_searches(endpoint, resource_attempt)
 
     _add_matches(endpoint, search_1, matches)
     if search_1 != search_2:
@@ -63,7 +66,7 @@ async def best_match(endpoint: str, resource_attempt: str) -> str:
     return matches[0][0]
 
 
-async def main():
+async def _test():
     mon = input('Input something to match: ')
     match = await best_match('pokemon', mon)
     print(f'Best match: {match}')
