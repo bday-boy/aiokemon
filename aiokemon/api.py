@@ -7,8 +7,6 @@ from aiokemon.common import Resource
 
 FIND_MATCH = True
 
-loop = asyncio.get_event_loop()
-
 
 class APIResource:
     """Forward declaration of APIResource for type hinting purposes."""
@@ -32,14 +30,12 @@ class APIResource:
     """
 
     def __init__(self, endpoint: str, resource: Resource,
-                 loop: asyncio.AbstractEventLoop,
                  custom: Optional[dict] = None) -> None:
         """Creates an un-loaded APIResource class. Attributes and such can
         only be guaranteed once the async function _load is called.
         """
         if custom is not None:
             cmn.set_safe_attrs(self, **custom)
-        self._loop = loop
         self._endpoint = endpoint
         self._resource = resource
         self._loaded = False
@@ -86,7 +82,10 @@ class APIMetaData:
             return None
 
 
-def make_object(obj):
+def make_object(obj: Any) -> Any:
+    """Turns a dictionary into an APIMetaData object and does nothing
+    otherwise.
+    """
     if isinstance(obj, dict):
         return APIMetaData(obj)
     return obj
@@ -113,16 +112,21 @@ def sanitize_data(data: dict) -> dict:
 
 async def get_resource(endpoint: str, resource: Resource) -> APIResource:
     """Async wrapper function for creating a new resource class."""
-    apiresource = APIResource(endpoint, resource, loop)
+    apiresource = APIResource(endpoint, resource)
     await apiresource._load()
     return apiresource
 
 
 async def test():
+    print('Doing test()...')
     p = await get_resource('pokemon', 'breloom')
     print(p.name)
     print(p.abilities[0].ability.name)
+    ability = await p.abilities[0].ability.as_resource()
+    print(ability.name)
+    print(dir(ability))
 
 
 if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(test())
