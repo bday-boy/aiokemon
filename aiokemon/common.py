@@ -4,12 +4,14 @@ from typing import Optional, Tuple, Union
 import aiohttp_client_cache as aiohttp
 import requests
 
+import aiokemon.utils.file as fmanager
+
 BASE_URL = 'https://pokeapi.co/api/v2'
 VALID_ENDPOINTS = set(requests.get(BASE_URL).json())
 Resource = Union[str, int]
 cache = aiohttp.SQLiteBackend(
-    cache_name='~/.cache/aiohttp-requests.db',
-    expire_after=60*60*24
+    cache_name=fmanager.cache_file('aiohttp-requests.db'),
+    expire_after=60*60*24*7 # a week
 )
 
 
