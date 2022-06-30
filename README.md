@@ -66,7 +66,7 @@ functions very similarly to Pokebase.
 
 ### Fuzzy String Matching
 
-As mentioned in Features, aiokemon can fix small errors in resource names.
+As mentioned in __Features__, aiokemon can fix small errors in resource names.
 This functionality can be toggled by changing the `FIND_MATCH` variable.
 Resources that are an exact match will be returned immediately, so
 matching doesn't cause much overhead when resource requests are exact
