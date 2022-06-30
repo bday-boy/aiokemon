@@ -1,12 +1,16 @@
 import keyword
 from typing import Optional, Tuple, Union
 
-import aiohttp
+import aiohttp_client_cache as aiohttp
 import requests
 
 BASE_URL = 'https://pokeapi.co/api/v2'
 VALID_ENDPOINTS = set(requests.get(BASE_URL).json())
 Resource = Union[str, int]
+cache = aiohttp.SQLiteBackend(
+    cache_name='~/.cache/aiohttp-requests.db',
+    expire_after=60*60*24
+)
 
 
 def join_url(*url_components: str) -> str:
@@ -52,6 +56,9 @@ def sanitize_attribute(attr: str) -> str:
 
 
 def set_safe_attrs(self_: object, **attr_value_pairs) -> None:
+    """Sets all attribute-value pairs on an object after sanitizing each
+    attribute.
+    """
     for k, v in attr_value_pairs.items():
         setattr(self_, sanitize_attribute(k), v)
 
@@ -60,9 +67,10 @@ async def get_json(url: str) -> dict:
     """Asynchronously gets a json as a dictionary from a GET request.
 
     ## Raises
-    `aiohttp.ClientResponseError` if there was an error during the request.
+    `aiohttp.ClientResponseError` if there was an error during the
+    request.
     """
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.CachedSession(cache=cache) as session:
         async with session.get(url) as response:
             response.raise_for_status()
             return await response.json()
