@@ -13,7 +13,6 @@ setup(
     description='An asynchronous Python wrapper for making PokéAPI requests',
     long_description=readme(),
     author='Birthday Boy',
-    author_email='setup.pymademedothis@gmail.com',
     url='https://github.com/bday-boy/aiokemon',
     keywords=['pokemon', 'wrapper', 'RESTAPI'],
     install_requires=['aiohttp-client-cache', 'aiosqlite', 'requests'],
