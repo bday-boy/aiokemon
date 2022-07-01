@@ -1,6 +1,8 @@
 import os
+from typing import Optional
 
 home = os.path.expanduser('~')
+
 
 def make_cache() -> str:
     """Creates a .cache directory at the user's home if one doesn't
@@ -20,6 +22,11 @@ def make_cache() -> str:
     return cache_dir
 
 
-def cache_file(cache_file: str) -> str:
-    cache_dir = make_cache()
+def cache_file(cache_file: str, *, cache_dir: Optional[str] = None) -> str:
+    """Gets the path to a cache file of the given name. If a .cache directory
+    doesn't exist in the user's home, and no cache_dir is passed, it is
+    created.
+    """
+    if cache_dir is None:
+        cache_dir = make_cache()
     return os.path.join(cache_dir, cache_file)
