@@ -22,9 +22,11 @@ def _get_searches(endpoint: str, resource_attempt: str) -> Tuple[str, str]:
         '-'.join(split_resource), '-'.join(reversed(split_resource))
     )
 
+
 async def _get_all_resources(endpoint: str) -> dict:
     """Queries an endpoint for all of its resources."""
     return await cmn.get_by_resource(endpoint, querystring='limit=100000')
+
 
 async def _load_endpoint(endpoint: str):
     """If an endpoint doesn't exist in the endpoint_resources dict, it is
@@ -39,12 +41,14 @@ async def _load_endpoint(endpoint: str):
     valid_resources = {result['name'] for result in resources['results']}
     endpoint_resources[endpoint] = valid_resources
 
+
 def _add_matches(endpoint: str, search: str, matches: list) -> None:
     """Computes string distance between the search and the actual endpoint
     for each resource in the endpoint and adds it to the matches list.
     """
     for resource in endpoint_resources[endpoint]:
         matches.append((resource, levenshtein_osa(resource, search)))
+
 
 async def best_match(endpoint: str, resource_attempt: str) -> str:
     """Finds the best match for a given resource of a given endpoint."""

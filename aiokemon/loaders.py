@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from aiokemon.api import get_resource
 from aiokemon.common import Resource
 

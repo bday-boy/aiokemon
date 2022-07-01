@@ -16,8 +16,8 @@ original repo cuz I'm lazy.
   (which is why I made this library in the first place)
 - Easy lookup of resource attributes via the `.` operator
 - Can use basic fuzzy string matching to correct small typos and fit
-  nonexistent resource names to correct ones, i.e. `gardevor` ->
-  `gardevoir` or even `Shield Aegislash` -> `aegislash-shield`
+  nonexistent resource names to correct ones, i.e. `gardevor` →
+  `gardevoir` or even `Shield Aegislash` → `aegislash-shield`
 
 ## Key Differences From Pokebase
 
@@ -82,3 +82,5 @@ a person searching for move information through a Discord bot).
 WIP :)
 
 ## Installation
+
+None yet.
