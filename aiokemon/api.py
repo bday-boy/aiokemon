@@ -2,7 +2,7 @@ import asyncio
 from typing import Any, List, Optional
 
 import aiokemon.common as cmn
-import aiokemon.resourcematcher as matcher
+import aiokemon.matcher as matcher
 from aiokemon.common import Resource
 
 FIND_MATCH = True
