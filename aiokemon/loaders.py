@@ -1,4 +1,4 @@
-from aiokemon.api import get_resource
+from aiokemon.api import get_resource, get_subresource
 from aiokemon.common import Resource
 
 
@@ -359,7 +359,11 @@ async def pokemon(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon for attributes and more detailed
     information.
     """
-    return await get_resource("pokemon", resource, **kwargs)
+    pkmn = await get_resource("pokemon", resource, **kwargs)
+    pkmn.location_area_encounters = await get_subresource(
+        'location_area_encounters', pkmn.location_area_encounters
+    )
+    return pkmn
 
 
 async def pokemon_color(resource: Resource, **kwargs):
@@ -404,8 +408,11 @@ async def pokemon_species(resource: Resource, **kwargs):
     See https://pokeapi.co/docsv2/#pokemon-species for attributes and more
     detailed information.
     """
-
-    return await get_resource("pokemon-species", resource, **kwargs)
+    pkmn = await get_resource("pokemon-species", resource, **kwargs)
+    pkmn.evolution_chain = await get_subresource(
+        'evolution_chain', pkmn.evolution_chain.url
+    )
+    return pkmn
 
 
 async def stat(resource: Resource, **kwargs):
