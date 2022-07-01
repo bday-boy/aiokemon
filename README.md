@@ -1,5 +1,7 @@
 # aiokemon
 
+[![License](https://img.shields.io/github/license/bday-boy/aiokemon?style=for-the-badge)](./LICENSE)
+
 __aiokemon__ is an asynchronous Python wrapper for making PokéAPI requests.
 
 It took a lot of inspiration from
@@ -34,8 +36,8 @@ as they are requested by the user. For example:
 >>> # of the pokemon endpoint, we can still do this:
 >>> breloom.abilities[0].ability.pokemon[0].pokemon.name
 'vileplume'
->>> # Pokebase loaded the effect-spore resource behind the scenes so now we
->>> # can treat that entry as its own entire resource
+>>> # Pokebase loaded the effect-spore ability resource behind the scenes so
+>>> # now we can treat that attribute as its own entire resource
 ```
 
 However, due to the nature of async and also my tiny brain, Python's magic
@@ -76,8 +78,14 @@ a person searching for move information through a Discord bot).
 
 ## Development Status
 
-WIP :)
+Version 1.0 "works." I haven't figured out Python unit tests yet, so it could
+be buggy garbage for all I know.
 
 ## Installation
 
-None yet.
+__aiokemon__ isn't hosted on PyPi yet, but installation is fairly
+straightforward:
+
+```python
+python ./setup.py install
+```
