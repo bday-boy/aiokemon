@@ -45,7 +45,10 @@ class APIResource:
     @property
     def attrs(self) -> List[str]:
         """Returns all non-private attributes of the class."""
-        return [k for k in dir(self) if not k.startswith('_')]
+        return [
+            k for k in dir(self) if not k.startswith('_')
+            and k not in {'attrs'}
+        ]
 
     async def _load(self) -> None:
         """Asynchronously loads the information for the given resource
@@ -83,7 +86,10 @@ class APIMetaData:
     @property
     def attrs(self) -> List[str]:
         """Returns all non-private attributes of the class."""
-        return [k for k in dir(self) if not k.startswith('_')]
+        return [
+            k for k in dir(self) if not k.startswith('_')
+            and k not in {'attrs', 'as_resource', 'from_data'}
+        ]
 
     async def as_resource(self, raise_error: bool = False,
                           **kwargs) -> APIResource:
