@@ -1,11 +1,15 @@
 import asyncio
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 import aiokemon.common as cmn
 import aiokemon.matcher as matcher
 from aiokemon.common import Resource
 
 FIND_MATCH = True
+
+
+class APIMetaData:
+    """Forward declaration for type hinting."""
 
 
 class APIResource:
@@ -72,6 +76,19 @@ class APIResource:
 class APIMetaData:
     """More simple class for when data doesn't need to be loaded."""
 
+    @staticmethod
+    def from_data(key: str, data: Union[dict, list]
+                  ) -> Union[APIMetaData, List[APIMetaData]]:
+        if isinstance(data, dict):
+            return APIMetaData(key, data)
+        elif isinstance(data, list) \
+                and all(isinstance(entry, dict) for entry in data):
+            return [APIMetaData(key, entry) for entry in data]
+        else:
+            raise TypeError(
+                'APIMetaData can only be created from a dict or list of dicts.'
+            )
+
     def __init__(self, key: str, data: dict) -> None:
         self._key = key
         sanitized_data = sanitize_data(data)
@@ -108,11 +125,11 @@ class APIMetaData:
 
 
 def make_object(key: str, obj: Any) -> Any:
-    """Turns a dictionary into an APIMetaData object and does nothing
-    otherwise.
+    """Turns a dict or list of dicts into an APIMetaData object or a list of
+    APIMetaData objects and does nothing otherwise.
     """
-    if isinstance(obj, dict):
-        return APIMetaData(key, obj)
+    if isinstance(obj, dict) or isinstance(obj, list):
+        return APIMetaData.from_data(key, obj)
     return obj
 
 
@@ -137,10 +154,18 @@ def sanitize_data(data: dict) -> dict:
 
 async def get_resource(endpoint: str, resource: Resource,
                        **kwargs) -> APIResource:
-    """Async wrapper function for creating a new resource class."""
+    """Async wrapper function for creating a new APIResource instance."""
     apiresource = APIResource(endpoint, resource, **kwargs)
     await apiresource._load()
     return apiresource
+
+
+async def get_subresource(name: str, url: str
+                          ) -> Union[APIMetaData, List[APIMetaData]]:
+    """Async wrapper function for creating a new APIMetaData instance."""
+    data = await cmn.get_by_url(url)
+    apimetadata = APIMetaData.from_data(name, data)
+    return apimetadata
 
 
 async def test():

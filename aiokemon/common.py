@@ -85,7 +85,17 @@ async def get_by_resource(endpoint: str, resource: Optional[Resource] = None,
     if querystring is not None:
         url += '?' + querystring.lstrip('?')
     json_data = await get_json(url)
-    json_data['url'] = url
+    if isinstance(json_data, dict):
+        json_data['url'] = url
+    return json_data
+
+
+async def get_by_url(url: str) -> dict:
+    """Gets a resource directly via the url. Useful for situations like
+    Pokemon encounters, which are a sub-resource."""
+    json_data = await get_json(url)
+    if isinstance(json_data, dict):
+        json_data['url'] = url
     return json_data
 
 
