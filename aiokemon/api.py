@@ -5,8 +5,6 @@ import aiokemon.common as cmn
 import aiokemon.matcher as matcher
 from aiokemon.common import Resource
 
-FIND_MATCH = True
-
 
 class APIMetaData:
     """Forward declaration for type hinting."""
@@ -58,7 +56,7 @@ class APIResource:
         """Asynchronously loads the information for the given resource
         in-place and returns a reference to itself.
         """
-        if FIND_MATCH and isinstance(self._resource, str):
+        if isinstance(self._resource, str):
             self._resource = await matcher.best_match(
                 self._endpoint, self._resource
             )
