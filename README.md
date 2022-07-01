@@ -6,9 +6,7 @@ It took a lot of inspiration from
 [Pokebase](https://github.com/PokeAPI/pokebase), so huge thanks to everyone
 who contributed to that project. I only didn't make a fork because enough of
 the code base is different that refactoring it would've been more effort than
-just working from scratch. I might make a fork in the future just cuz I feel
-like a jerk for stealing so many of their ideas/syntax and not forking the
-original repo cuz I'm lazy.
+just working from scratch.
 
 ## Features
 
@@ -67,10 +65,9 @@ functions very similarly to Pokebase.
 ### Fuzzy String Matching
 
 As mentioned in __Features__, aiokemon can fix small errors in resource names.
-This functionality can be toggled by changing the `FIND_MATCH` variable.
-Resources that are an exact match will be returned immediately, so
-matching doesn't cause much overhead when resource requests are exact
-matches for ones.
+This functionality cannot be toggled for now, but resources are returned
+immediately when an exact match exists. This way, overhead only occurs with
+inexact searches.
 
 Once again, this functionality was meant to improve the ability of this
 library to interface with Discord.py. With fuzzy string matching, PokeAPI can
