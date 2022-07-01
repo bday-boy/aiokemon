@@ -11,7 +11,7 @@ VALID_ENDPOINTS = set(requests.get(BASE_URL).json())
 Resource = Union[str, int]
 cache = aiohttp.SQLiteBackend(
     cache_name=fmanager.cache_file('aiohttp-requests.db'),
-    expire_after=60*60*24*7 # a week
+    expire_after=60*60*24*7  # a week
 )
 
 
@@ -55,14 +55,6 @@ def sanitize_attribute(attr: str) -> str:
         )
         return attr + '_'
     return attr
-
-
-def set_safe_attrs(self_: object, **attr_value_pairs) -> None:
-    """Sets all attribute-value pairs on an object after sanitizing each
-    attribute.
-    """
-    for k, v in attr_value_pairs.items():
-        setattr(self_, sanitize_attribute(k), v)
 
 
 async def get_json(url: str) -> dict:

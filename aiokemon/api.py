@@ -28,10 +28,10 @@ class APIResource:
     def __init__(self, endpoint: str, resource: Resource,
                  custom: Optional[dict] = None) -> None:
         """Creates an un-loaded APIResource class. Attributes and such can
-        only be guaranteed once the async function _load is called.
+        only be guaranteed once the async function _load is awaited.
         """
         if custom is not None:
-            cmn.set_safe_attrs(self, **custom)
+            self.__dict__.update(custom)
         self._endpoint = endpoint
         self._resource = resource
         self._loaded = False
@@ -44,6 +44,7 @@ class APIResource:
 
     @property
     def attrs(self) -> List[str]:
+        """Returns all non-private attributes of the class."""
         return [k for k in dir(self) if not k.startswith('_')]
 
     async def _load(self) -> None:
@@ -61,7 +62,7 @@ class APIResource:
         data = await cmn.get_by_resource(self._endpoint, self._resource)
         sanitized_data = sanitize_data(data)
 
-        cmn.set_safe_attrs(self, **sanitized_data)
+        self.__dict__.update(sanitized_data)
         self._loaded = True
 
 
@@ -71,7 +72,7 @@ class APIMetaData:
     def __init__(self, key: str, data: dict) -> None:
         self._key = key
         sanitized_data = sanitize_data(data)
-        cmn.set_safe_attrs(self, **sanitized_data)
+        self.__dict__.update(sanitized_data)
 
     def __str__(self) -> str:
         return self._key
@@ -81,6 +82,7 @@ class APIMetaData:
 
     @property
     def attrs(self) -> List[str]:
+        """Returns all non-private attributes of the class."""
         return [k for k in dir(self) if not k.startswith('_')]
 
     async def as_resource(self, raise_error: bool = False,
