@@ -15,6 +15,11 @@ setup(
     author='Birthday Boy',
     url='https://github.com/bday-boy/aiokemon',
     keywords=['pokemon', 'wrapper', 'RESTAPI'],
-    install_requires=['aiohttp-client-cache', 'aiosqlite', 'requests'],
+    install_requires=[
+        'aiohttp',
+        'aiohttp-client-cache',
+        'aiosqlite',
+        'requests'
+    ],
     license='MIT License'
 )
