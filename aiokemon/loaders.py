@@ -1,3 +1,9 @@
+"""
+This file is an async-ified version of similar code found in Pokebase.
+The commit from which I copied the code can be found here:
+https://github.com/PokeAPI/pokebase/blob/dbd3b6b66b919740d1f710e729eb98f3930fa522/pokebase/loaders.py
+"""
+
 from aiokemon.api import get_resource, get_subresource
 from aiokemon.common import Resource
 
