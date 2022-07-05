@@ -70,13 +70,13 @@ def join_url(*url_parts: str, query: Optional[str] = None) -> str:
     """Returns a URL by stripping the components of trailing forward slashes
     and then joining them with forward slashes. Ignores falsy parts.
     """
-    url = '/'.join(str(part).strip('/') for part in url_parts if part)
+    url = '/'.join(part.strip('/') for part in url_parts if part)
     if query:
         url += '?' + query.lstrip('?')
     return url
 
 
-def break_url(url: str) -> Tuple[str, str]:
+def break_url(url: str) -> Tuple[str, Union[str, None]]:
     """Breaks apart a URL into the endpoint and resource."""
     if BASE_URL not in url:
         raise ValueError(f'URL must be for PokéAPI. Got {url} instead.')
@@ -132,7 +132,7 @@ async def get_json(url: str) -> dict:
             return await response.json()
 
 
-async def get_by_resource(endpoint: str, resource: Optional[Resource] = None,
+async def get_by_resource(endpoint: str, resource: Optional[str] = None,
                           querystring: Optional[str] = None) -> dict:
     """Joins the base URL, the endpoint, the resource, and the querystring
     together, then asynchronously sends a GET request for it.

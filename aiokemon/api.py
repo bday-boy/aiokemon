@@ -64,7 +64,7 @@ class APIResource:
         self.name = name
         self.id = id_
 
-        data = await cmn.get_by_resource(self._endpoint, self._resource)
+        data = await cmn.get_by_resource(self._endpoint, str(self._resource))
         sanitized_data = sanitize_data(data)
 
         self.__dict__.update(sanitized_data)
@@ -111,7 +111,6 @@ class APIMetaData:
         """Creates a new APIResource based on the URL from this class."""
         if getattr(self, 'url', False):
             endpoint, resource = cmn.break_url(self.url)
-            print(endpoint, resource)
             return await get_resource(endpoint, resource, **kwargs)
         elif raise_error:
             raise AttributeError(
@@ -126,7 +125,7 @@ def make_object(key: str, obj: Any) -> Any:
     """Turns a dict or list of dicts into an APIMetaData object or a list of
     APIMetaData objects and does nothing otherwise.
     """
-    if isinstance(obj, dict) or isinstance(obj, list):
+    if isinstance(obj, (dict, list)):
         return APIMetaData.from_data(key, obj)
     return obj
 
@@ -140,12 +139,7 @@ def sanitize_data(data: dict) -> dict:
 
     for k, v in data.items():
         k = cmn.sanitize_attribute(k)
-        if isinstance(v, dict):
-            sanitized_data[k] = make_object(k, v)
-        elif isinstance(v, list):
-            sanitized_data[k] = [make_object(k, v_) for v_ in v]
-        else:
-            sanitized_data[k] = v
+        sanitized_data[k] = make_object(k, v)
 
     return sanitized_data
 
