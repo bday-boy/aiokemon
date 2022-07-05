@@ -6,6 +6,7 @@ https://github.com/PokeAPI/pokebase/blob/dbd3b6b66b919740d1f710e729eb98f3930fa52
 
 from aiokemon.api import get_resource, get_subresource
 from aiokemon.common import Resource
+from aiokemon.endpoints.pokemon import Pokemon
 
 
 async def berry(resource: Resource, **kwargs):
@@ -359,7 +360,7 @@ async def pokeathlon_stat(resource: Resource, **kwargs):
     return await get_resource("pokeathlon-stat", resource, **kwargs)
 
 
-async def pokemon(resource: Resource, **kwargs):
+async def pokemon(resource: Resource, **kwargs) -> Pokemon:
     """Quick pokemon lookup.
 
     See https://pokeapi.co/docsv2/#pokemon for attributes and more detailed
