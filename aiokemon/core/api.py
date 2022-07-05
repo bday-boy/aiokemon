@@ -46,7 +46,7 @@ class APIResource:
 
     @property
     def attrs(self) -> List[str]:
-        """Returns all non-private attributes of the class."""
+        """Returns all PokéAPI attributes of the class."""
         return [
             k for k in dir(self) if not k.startswith('_')
             and k not in {'attrs'}
@@ -100,7 +100,7 @@ class APIMetaData:
 
     @property
     def attrs(self) -> List[str]:
-        """Returns all non-private attributes of the class."""
+        """Returns all PokéAPI attributes of the class."""
         return [
             k for k in dir(self) if not k.startswith('_')
             and k not in {'attrs', 'as_resource', 'from_data'}
@@ -158,18 +158,3 @@ async def get_subresource(name: str, url: str
     data = await cmn.get_by_url(url)
     apimetadata = APIMetaData.from_data(name, data)
     return apimetadata
-
-
-async def test():
-    print('Doing test()...')
-    p = await get_resource('pokemon', 'breloom')
-    print(p.name)
-    print(p.abilities[0].ability.name)
-    ability = await p.abilities[0].ability.as_resource()
-    print(ability.name)
-    print(dir(ability))
-
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(test())
