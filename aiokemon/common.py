@@ -1,5 +1,7 @@
 import keyword
+import re
 from typing import Optional, Tuple, Union
+from urllib.parse import urlparse
 
 import aiohttp_client_cache as aiohttp
 import requests
@@ -9,30 +11,37 @@ import aiokemon.utils.file as fmanager
 BASE_URL = 'https://pokeapi.co/api/v2'
 VALID_ENDPOINTS = set(requests.get(BASE_URL).json())
 Resource = Union[str, int]
+backslashes = re.compile(r'/+')
 cache = aiohttp.SQLiteBackend(
     cache_name=fmanager.cache_file('aiohttp-requests.db'),
     expire_after=60*60*24*7  # a week
 )
 
 
-def join_url(*url_components: str) -> str:
+def join_url(*url_parts: str, query: Optional[str] = None) -> str:
     """Returns a URL by stripping the components of trailing forward slashes
-    and then joining them with forward slashes.
+    and then joining them with forward slashes. Ignores falsy parts.
     """
-    return '/'.join(component.strip('/') for component in url_components)
+    url = '/'.join(str(part).strip('/') for part in url_parts if part)
+    if query:
+        url += '?' + query.lstrip('?')
+    return url
 
 
 def break_url(url: str) -> Tuple[str, str]:
     """Breaks apart a URL into the endpoint and resource."""
-    index = url.find(BASE_URL)
-    if index == -1:
-        raise ValueError(f'base URL "{BASE_URL}" is not in that URL.')
-    url_component = url[index + len(BASE_URL):].strip('/').split('/')
-    endpoint, resource = url_component
+    if BASE_URL not in url:
+        raise ValueError(f'URL must be for PokéAPI. Got {url} instead.')
+    url_path = urlparse(url).path.strip('/')
+    path_components = backslashes.split(url_path)
+    endpoint = path_components[2]
     try:
+        resource = path_components[3]
         return endpoint, int(resource)
     except ValueError:
         return endpoint, resource
+    except IndexError:
+        return endpoint, None
 
 
 def sanitize_attribute(attr: str) -> str:
@@ -79,11 +88,7 @@ async def get_by_resource(endpoint: str, resource: Optional[Resource] = None,
         raise ValueError(
             "resource OR querystring can be non-None, but not both."
         )
-    url = join_url(BASE_URL, endpoint)
-    if resource is not None:
-        url += '/' + str(resource).lstrip('/')
-    if querystring is not None:
-        url += '?' + querystring.lstrip('?')
+    url = join_url(BASE_URL, endpoint, resource, query=querystring)
     json_data = await get_json(url)
     if isinstance(json_data, dict):
         json_data['url'] = url
