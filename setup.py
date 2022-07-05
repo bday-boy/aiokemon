@@ -9,7 +9,7 @@ def readme() -> str:
 setup(
     name='aiokemon',
     packages=find_packages(),
-    version='1.0.1',
+    version='1.0.0',
     description='An asynchronous Python wrapper for making PokéAPI requests',
     long_description=readme(),
     author='Birthday Boy',

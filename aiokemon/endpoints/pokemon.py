@@ -1,7 +1,7 @@
 from typing import List
 
 from aiokemon.api import APIResource
-from aiokemon.endpoints.common import SimpleSubResource
+from aiokemon.endpoints.common import SimpleSubResource, GameIndex
 from aiokemon.endpoints.sprite import Sprite
 
 
@@ -10,12 +10,6 @@ class Ability:
     ability: SimpleSubResource
     is_hidden: bool
     slot: int
-
-
-class GameIndex:
-    """A game index entry in a Pokemon's game_indices array."""
-    game_index: int
-    version: SimpleSubResource
 
 
 class VersionDetail:
@@ -57,7 +51,7 @@ class Type:
 
 
 class Pokemon(APIResource):
-    """A Pokemon endpoint resource."""
+    """A pokemon endpoint resource."""
     abilities: List[Ability]
     base_experience: int
     forms: List[SimpleSubResource]

@@ -18,6 +18,56 @@ just working from scratch.
 - Can use basic fuzzy string matching to correct small typos and fit
   nonexistent resource names to correct ones, i.e. `gardevor` →
   `gardevoir` or even `Shield Aegislash` → `aegislash-shield`
+- Full type hinting of resources and their attributes
+
+## Usage
+
+aiokemon is so similar to Pokebase that it can essentially be used as a
+drop-in. So, as one might imagine, its syntax is very similar as well.
+
+For example, if we want to get a Pokémon:
+
+```python
+>>> import aiokemon as ak
+>>> breloom = await ak.pokemon('breloom')
+>>> breloom
+<pokemon-breloom>
+>>> breloom.abilities[0].ability.name
+'effect-spore'
+>>> breloom.attrs # shows PokéAPI data attributes
+['abilities', 'base_experience', 'forms', 'game_indices', 'height', 'held_items', 'id', 'is_default', 'location_area_encounters', 'moves', 'name', 'order', 'past_types', 'species', 'sprites', 'stats', 'types', 'url', 'weight']
+```
+
+Suppose we decide to get one of its moves as well:
+
+```python
+>>> mega_punch = await breloom.moves[0].move.as_resource()
+>>> mega_punch.accuracy
+85
+>>> mega_punch.target.name
+'selected-pokemon'
+```
+
+And it's as easy as that.
+
+### Important Note About Type Hinting
+
+While still in development, aiokemon has support for fully type-hinted
+resources. Here is an example in VSCode:
+
+![Pokemon endpoint type hint example](./images/type%20hinting%20example.png)
+
+However, the important thing to note about the type hinting is that only
+each endpoint's specific wrapper function will return a class with the
+included attributes. Another important note is that the attributes are more or
+less a lie. The type hinting is achieved by creating empty classes with
+typed instance variables to match what each resource has on PokéAPI. While
+they *should* all be present, it's entirely possible that a resource may be
+missing something, or that I messed up the hinting somewhere.
+
+That being said, in the origina usage example, if you want to get type hinting
+for Mega Punch, then you should do `ak.move(breloom.moves[0].move.name)`
+instead.
 
 ## Key Differences From Pokebase
 
