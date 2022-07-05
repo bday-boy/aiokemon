@@ -17,14 +17,14 @@ def make_cache() -> str:
         if not os.path.isdir(cache_dir):
             raise OSError(
                 "couldn't create the .cache directory. Please create one "
-                "manually at ~/.cache"
+                "manually in your user's home directory."
             )
     return cache_dir
 
 
 def cache_file(cache_file: str, *, cache_dir: Optional[str] = None) -> str:
     """Gets the path to a cache file of the given name. If a .cache directory
-    doesn't exist in the user's home, and no cache_dir is passed, it is
+    doesn't exist in the user's home and no cache_dir is passed, one is
     created.
     """
     if cache_dir is None:
