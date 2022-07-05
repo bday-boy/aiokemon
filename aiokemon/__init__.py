@@ -1,14 +1,16 @@
 from aiokemon.core.api import APIResource, get_resource
 from aiokemon.core.common import get_resource_id
 from aiokemon.core.loaders import *
+from aiokemon.endpoints.pokemon.pokemon import Pokemon
+from aiokemon.endpoints.pokemon.types import Type
 
 __all__ = [
-    # broad API functionality
+    # Broad API functionality
     'APIResource',
     'get_resource',
     'get_resource_id',
 
-    # resource-specific functions
+    # Resource-specific functions (recommended use)
     'berry',
     'berry_firmness',
     'berry_flavor',
@@ -56,5 +58,9 @@ __all__ = [
     'pokemon_species',
     'stat',
     'type_',
-    'language'
+    'language',
+
+    # Classes for type hinting
+    'Pokemon',
+    'Type'
 ]

@@ -11,7 +11,8 @@ loaded, all of the attributes hinted in the Pokemon class should be populated.
 
 from aiokemon.core.api import get_resource, get_subresource
 from aiokemon.core.common import Resource
-from aiokemon.endpoints.pokemon import Pokemon, Type
+from aiokemon.endpoints.pokemon.pokemon import Pokemon
+from aiokemon.endpoints.pokemon.types import Type
 
 
 async def berry(resource: Resource, **kwargs):
