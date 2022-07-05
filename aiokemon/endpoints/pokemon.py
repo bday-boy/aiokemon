@@ -1,6 +1,6 @@
 from typing import List
 
-from aiokemon.api import APIResource
+from aiokemon.core.api import APIResource
 from aiokemon.endpoints.common import SimpleSubResource, GameIndex
 from aiokemon.endpoints.sprite import Sprite
 

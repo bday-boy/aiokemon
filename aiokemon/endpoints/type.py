@@ -1,5 +1,6 @@
 from typing import List
 
+from aiokemon.core.api import APIResource
 from aiokemon.endpoints.common import SimpleSubResource, GameIndex
 
 
@@ -31,11 +32,11 @@ class PokemonType:
     slot: int
 
 
-class Type:
+class Type(APIResource):
     """A type endpoint resource."""
     damage_relations: DamageRelations
     game_indices: List[GameIndex]
-    generation: object
+    generation: SimpleSubResource
     id: int
     move_damage_class: SimpleSubResource
     moves: List[SimpleSubResource]

@@ -2,11 +2,16 @@
 This file is an async-ified version of the code found in Pokebase.
 The commit from which I copied the code can be found here:
 https://github.com/PokeAPI/pokebase/blob/dbd3b6b66b919740d1f710e729eb98f3930fa522/pokebase/loaders.py
+
+Note that some of the type hinting of this file is a bit misleading. For
+example, the pokemon() function doesn't actually return an instance of
+class Pokemon, it returns an APIResource. However, once that APIResource is
+loaded, all of the attributes hinted in the Pokemon class should be populated.
 """
 
-from aiokemon.api import get_resource, get_subresource
-from aiokemon.common import Resource
-from aiokemon.endpoints.pokemon import Pokemon
+from aiokemon.core.api import get_resource, get_subresource
+from aiokemon.core.common import Resource
+from aiokemon.endpoints.pokemon import Pokemon, Type
 
 
 async def berry(resource: Resource, **kwargs):
@@ -431,7 +436,7 @@ async def stat(resource: Resource, **kwargs):
     return await get_resource("stat", resource, **kwargs)
 
 
-async def type_(resource: Resource, **kwargs):
+async def type_(resource: Resource, **kwargs) -> Type:
     """Quick type lookup.
 
     See https://pokeapi.co/docsv2/#types for attributes and more detailed

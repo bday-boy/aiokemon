@@ -1,7 +1,7 @@
 import re
 from typing import Tuple
 
-import aiokemon.common as cmn
+import aiokemon.core.common as cmn
 from aiokemon.utils.text import levenshtein_osa
 
 and_pokemon = re.compile(r'\s?(pok[eé]mon|and)\s?', re.IGNORECASE)

@@ -1,11 +1,14 @@
-from aiokemon.api import APIResource, get_resource
-from aiokemon.common import get_resource_id
-from aiokemon.loaders import *
+from aiokemon.core.api import APIResource, get_resource
+from aiokemon.core.common import get_resource_id
+from aiokemon.core.loaders import *
 
 __all__ = [
+    # broad API functionality
     'APIResource',
     'get_resource',
     'get_resource_id',
+
+    # resource-specific functions
     'berry',
     'berry_firmness',
     'berry_flavor',

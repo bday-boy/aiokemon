@@ -1,4 +1,4 @@
-from aiokemon.api import APIResource, APIMetaData
+from aiokemon.core.api import APIMetaData
 
 
 class SimpleSubResource(APIMetaData):

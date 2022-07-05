@@ -1,9 +1,9 @@
 import asyncio
 from typing import Any, List, Optional, Union
 
-import aiokemon.common as cmn
-import aiokemon.matcher as matcher
-from aiokemon.common import Resource
+import aiokemon.core.common as cmn
+import aiokemon.core.matcher as matcher
+from aiokemon.core.common import Resource
 
 
 class APIMetaData:
