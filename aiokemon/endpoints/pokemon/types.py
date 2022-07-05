@@ -1,46 +1,41 @@
 from typing import List
 
 from aiokemon.core.api import APIResource
-from aiokemon.endpoints.common import SimpleSubResource, GameIndex
+from aiokemon.endpoints.common import NamedAPIResource, GenerationGameIndex, \
+    Name
 
 
-class DamageRelations:
-    """A type's damage_relations."""
-    double_damage_from: List[SimpleSubResource]
-    double_damage_to: List[SimpleSubResource]
-    half_damage_from: List[SimpleSubResource]
-    half_damage_to: List[SimpleSubResource]
-    no_damage_from: List[SimpleSubResource]
-    no_damage_to: List[SimpleSubResource]
-
-
-class Name:
-    """A single names entry containing a name in a given language."""
-    language: SimpleSubResource
-    name: str
-
-
-class PastDamageRelation:
-    """The damage_relations for a previous generation."""
-    damage_relations: DamageRelations
-    generation: SimpleSubResource
-
-
-class PokemonType:
+class TypePokemon:
     """A single Pokemon and their type slot."""
-    pokemon: SimpleSubResource
     slot: int
+    pokemon: NamedAPIResource
+
+
+class TypeRelations:
+    """A type's damage_relations."""
+    double_damage_from: List[NamedAPIResource]
+    double_damage_to: List[NamedAPIResource]
+    half_damage_from: List[NamedAPIResource]
+    half_damage_to: List[NamedAPIResource]
+    no_damage_from: List[NamedAPIResource]
+    no_damage_to: List[NamedAPIResource]
+
+
+class TypeRelationsPast:
+    """The damage_relations for a previous generation."""
+    damage_relations: TypeRelations
+    generation: NamedAPIResource
 
 
 class Type(APIResource):
     """A type endpoint resource."""
-    damage_relations: DamageRelations
-    game_indices: List[GameIndex]
-    generation: SimpleSubResource
     id: int
-    move_damage_class: SimpleSubResource
-    moves: List[SimpleSubResource]
     name: str
+    damage_relations: TypeRelations
+    past_damage_relations: List[TypeRelationsPast]
+    game_indices: List[GenerationGameIndex]
+    generation: NamedAPIResource
+    move_damage_class: NamedAPIResource
     names: List[Name]
-    past_damage_relations: List[PastDamageRelation]
-    pokemon: List[PokemonType]
+    pokemon: List[TypePokemon]
+    moves: List[NamedAPIResource]

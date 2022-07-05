@@ -3,14 +3,14 @@ from typing import Union
 
 class BaseSprite:
     """The base sprite subresource in the pokemon endpoint."""
-    back_default: str
-    back_female: Union[str, None]
-    back_shiny: str
-    back_shiny_female: Union[str, None]
     front_default: str
-    front_female: Union[str, None]
     front_shiny: str
+    front_female: Union[str, None]
     front_shiny_female: Union[str, None]
+    back_default: str
+    back_shiny: str
+    back_female: Union[str, None]
+    back_shiny_female: Union[str, None]
     other: type
     versions: type
 
@@ -41,6 +41,6 @@ class Other:
     official_artwork: OfficialArtwork
 
 
-class Sprite(BaseSprite):
+class PokemonSprites(BaseSprite):
     """A pokemon endpoint's sprite data."""
     other: Other

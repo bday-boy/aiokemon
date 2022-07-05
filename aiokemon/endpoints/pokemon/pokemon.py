@@ -1,72 +1,78 @@
 from typing import List
 
 from aiokemon.core.api import APIResource
-from aiokemon.endpoints.common import SimpleSubResource, GameIndex
-from aiokemon.endpoints.sprite import Sprite
+from aiokemon.endpoints.common import NamedAPIResource, GenerationGameIndex
+from aiokemon.endpoints.sprite import PokemonSprites
 
 
-class Ability:
+class PokemonAbility:
     """An ability entry in a Pokemon's abilities array."""
-    ability: SimpleSubResource
     is_hidden: bool
     slot: int
+    ability: NamedAPIResource
 
 
-class VersionDetail:
+class PokemonHeldItemVersion:
     """A single version_details entry."""
+    version: NamedAPIResource
     rarity: int
-    version: SimpleSubResource
 
 
-class HeldItem:
+class PokemonHeldItem:
     """A held item entry in a Pokemon's held_items array."""
-    item: SimpleSubResource
-    version_details: List[VersionDetail]
+    item: NamedAPIResource
+    version_details: List[PokemonHeldItemVersion]
 
 
-class VersionGroupDetail:
+class PokemonMoveVersion:
     """A version group detail entry in a move's version_group_details array."""
+    move_learn_method: NamedAPIResource
+    version_group: NamedAPIResource
     level_learned_at: int
-    move_learn_method: SimpleSubResource
-    version_group: SimpleSubResource
 
 
-class Move:
+class PokemonMove:
     """A move entry in a Pokemon's moves array."""
-    move: SimpleSubResource
-    version_group_details: List[VersionGroupDetail]
+    move: NamedAPIResource
+    version_group_details: List[PokemonMoveVersion]
 
 
-class Stat:
+class PokemonStat:
     """A stat entry in a Pokemon's stats array."""
-    base_stat: int
+    stat: NamedAPIResource
     effort: int
-    stat: SimpleSubResource
+    base_stat: int
 
 
-class Type:
+class PokemonType:
     """A type entry in a Pokemon's types array."""
     slot: int
-    type: SimpleSubResource
+    type: NamedAPIResource
+
+
+class PokemonTypePast:
+    """A Pokemon's past types."""
+    generation: NamedAPIResource
+    types: List[PokemonType]
 
 
 class Pokemon(APIResource):
     """A pokemon endpoint resource."""
-    abilities: List[Ability]
-    base_experience: int
-    forms: List[SimpleSubResource]
-    game_indices: List[GameIndex]
-    height: int
-    held_items: List[HeldItem]
     id: int
-    is_default: bool
-    location_area_encounters: str
-    moves: List[Move]
     name: str
+    base_experience: int
+    height: int
+    is_default: bool
     order: int
-    past_types: List
-    species: SimpleSubResource
-    sprites: Sprite
-    stats: List[Stat]
-    types: List[SimpleSubResource]
     weight: int
+    abilities: List[PokemonAbility]
+    forms: List[NamedAPIResource]
+    game_indices: List[GenerationGameIndex]
+    held_items: List[PokemonHeldItem]
+    location_area_encounters: str
+    moves: List[PokemonMove]
+    past_types: List[PokemonTypePast]
+    sprites: PokemonSprites
+    species: NamedAPIResource
+    stats: List[PokemonStat]
+    types: List[NamedAPIResource]
