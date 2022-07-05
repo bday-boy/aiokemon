@@ -132,16 +132,16 @@ async def get_json(url: str) -> dict:
             return await response.json()
 
 
-async def get_by_resource(endpoint: str, resource: Optional[str] = None,
+async def get_by_resource(endpoint: str, resource: Optional[Resource] = None,
                           querystring: Optional[str] = None) -> dict:
     """Joins the base URL, the endpoint, the resource, and the querystring
     together, then asynchronously sends a GET request for it.
     """
-    if resource is not None and querystring is not None:
+    if resource and querystring:
         raise ValueError(
-            "resource OR querystring can be non-None, but not both."
+            "resource OR querystring can have a value, but not both."
         )
-    url = join_url(BASE_URL, endpoint, resource, query=querystring)
+    url = join_url(BASE_URL, endpoint, str(resource or ''), query=querystring)
     json_data = await get_json(url)
     if isinstance(json_data, dict):
         json_data['url'] = url

@@ -64,7 +64,7 @@ class APIResource:
         self.name = name
         self.id = id_
 
-        data = await cmn.get_by_resource(self._endpoint, str(self._resource))
+        data = await cmn.get_by_resource(self._endpoint, self._resource)
         sanitized_data = sanitize_data(data)
 
         self.__dict__.update(sanitized_data)
