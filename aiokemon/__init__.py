@@ -1,9 +1,11 @@
 from aiokemon.api import APIResource, get_resource
+from aiokemon.common import get_resource_id
 from aiokemon.loaders import *
 
 __all__ = [
     'APIResource',
     'get_resource',
+    'get_resource_id',
     'berry',
     'berry_firmness',
     'berry_flavor',

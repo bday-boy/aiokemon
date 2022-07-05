@@ -92,6 +92,11 @@ def break_url(url: str) -> Tuple[str, str]:
         return endpoint, None
 
 
+def get_resource_id(url: str) -> int:
+    """Returns the ID of a resource."""
+    return int(url.strip('/').split('/')[-1])
+
+
 def sanitize_attribute(attr: str) -> str:
     """Given a string, this function attempts to create a valid python
     identifier by replacing all hyphens with underscores. If the given string
