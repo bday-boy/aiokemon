@@ -4,12 +4,60 @@ from typing import Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import aiohttp_client_cache as aiohttp
-import requests
 
 import aiokemon.utils.file as fmanager
 
 BASE_URL = 'https://pokeapi.co/api/v2'
-VALID_ENDPOINTS = set(requests.get(BASE_URL).json())
+VALID_ENDPOINTS = {
+    'ability',
+    'berry',
+    'berry-firmness',
+    'berry-flavor',
+    'characteristic',
+    'contest-effect',
+    'contest-type',
+    'egg-group',
+    'encounter-condition',
+    'encounter-condition-value',
+    'encounter-method',
+    'evolution-chain',
+    'evolution-trigger',
+    'gender',
+    'generation',
+    'growth-rate',
+    'item',
+    'item-attribute',
+    'item-category',
+    'item-fling-effect',
+    'item-pocket',
+    'language',
+    'location',
+    'location-area',
+    'machine',
+    'move',
+    'move-ailment',
+    'move-battle-style',
+    'move-category',
+    'move-damage-class',
+    'move-learn-method',
+    'move-target',
+    'nature',
+    'pal-park-area',
+    'pokeathlon-stat',
+    'pokedex',
+    'pokemon',
+    'pokemon-color',
+    'pokemon-form',
+    'pokemon-habitat',
+    'pokemon-shape',
+    'pokemon-species',
+    'region',
+    'stat',
+    'super-contest-effect',
+    'type',
+    'version',
+    'version-group'
+}
 Resource = Union[str, int]
 backslashes = re.compile(r'/+')
 cache = aiohttp.SQLiteBackend(
@@ -97,7 +145,8 @@ async def get_by_resource(endpoint: str, resource: Optional[Resource] = None,
 
 async def get_by_url(url: str) -> dict:
     """Gets a resource directly via the url. Useful for situations like
-    Pokemon encounters, which are a sub-resource."""
+    Pokemon encounters, which are a sub-resource.
+    """
     json_data = await get_json(url)
     if isinstance(json_data, dict):
         json_data['url'] = url

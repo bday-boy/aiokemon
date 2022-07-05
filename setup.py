@@ -18,8 +18,7 @@ setup(
     install_requires=[
         'aiohttp',
         'aiohttp-client-cache',
-        'aiosqlite',
-        'requests'
+        'aiosqlite'
     ],
     license='MIT License'
 )
