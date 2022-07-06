@@ -136,10 +136,10 @@ async def name_and_id(endpoint: str, resource: Resource) -> Tuple[str, int]:
     if isinstance(resource, str):
         res = await get_by_resource(endpoint, resource)
         name = resource
-        id_ = res['id']
+        id_ = res.get('id')
     elif isinstance(resource, int):
         res = await get_by_resource(endpoint, resource)
-        name = res['name']
+        name = res.get('name')
         id_ = resource
     else:
         raise TypeError(
