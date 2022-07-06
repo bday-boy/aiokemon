@@ -79,7 +79,7 @@ def join_url(*url_parts: str, query: Optional[str] = None) -> str:
 def break_url(url: str) -> Tuple[str, Union[str, None]]:
     """Breaks apart a URL into the endpoint and resource."""
     if BASE_URL not in url:
-        raise ValueError(f'URL must be for PokéAPI. Got {url} instead.')
+        raise ValueError(f'URL must be for PokéAPI. Got "{url}" instead.')
     url_path = urlparse(url).path.strip('/')
     path_components = backslashes.split(url_path)
     endpoint = path_components[2]
@@ -90,33 +90,6 @@ def break_url(url: str) -> Tuple[str, Union[str, None]]:
         return endpoint, resource
     except IndexError:
         return endpoint, None
-
-
-def get_resource_id(url: str) -> int:
-    """Returns the ID of a resource."""
-    return int(url.strip('/').split('/')[-1])
-
-
-def sanitize_attribute(attr: str) -> str:
-    """Given a string, this function attempts to create a valid python
-    identifier by replacing all hyphens with underscores. If the given string
-    is a reserved Python keyword or a built-in function, a trailing underscore
-    is added (i.e. `True` -> `True_`).
-
-    ## Raises
-    `ValueError` when `attr` is not a valid identifier after replacing all
-    hyphens with underscores.
-    """
-    attr = attr.replace('-', '_')
-    if not attr.isidentifier():
-        raise ValueError(f'attr "{attr}" is not a valid identifier.')
-    if keyword.iskeyword(attr):
-        print(
-            f'Warning: string "{attr}" is a keyword. Adding a trailing '
-            'underscore to prevent syntax errors.'
-        )
-        return attr + '_'
-    return attr
 
 
 async def get_json(url: str) -> dict:
@@ -175,3 +148,30 @@ async def name_and_id(endpoint: str, resource: Resource) -> Tuple[str, int]:
         )
 
     return name, id_
+
+
+def get_resource_id(url: str) -> int:
+    """Returns the ID of a resource."""
+    return int(url.strip('/').split('/')[-1])
+
+
+def sanitize_attribute(attr: str) -> str:
+    """Given a string, this function attempts to create a valid python
+    identifier by replacing all hyphens with underscores. If the given string
+    is a reserved Python keyword or a built-in function, a trailing underscore
+    is added (i.e. `True` -> `True_`).
+
+    ## Raises
+    `ValueError` when `attr` is not a valid identifier after replacing all
+    hyphens with underscores.
+    """
+    attr = attr.replace('-', '_')
+    if not attr.isidentifier():
+        raise ValueError(f'attr "{attr}" is not a valid identifier.')
+    if keyword.iskeyword(attr):
+        print(
+            f'Warning: string "{attr}" is a keyword. Adding a trailing '
+            'underscore to prevent syntax errors.'
+        )
+        return attr + '_'
+    return attr
