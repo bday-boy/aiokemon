@@ -19,8 +19,9 @@ stat.characteristics
 
 from aiokemon.core.api import get_resource, get_subresource
 from aiokemon.core.common import Resource
-from aiokemon.endpoints.pokemon.pokemon import Pokemon
+from aiokemon.endpoints.pokemon.abilities import Ability
 from aiokemon.endpoints.pokemon.types import Type
+from aiokemon.endpoints.pokemon.pokemon import Pokemon
 
 
 async def berry(resource: Resource, **kwargs):
@@ -311,7 +312,7 @@ async def region(resource: Resource, **kwargs):
     return await get_resource("region", resource, **kwargs)
 
 
-async def ability(resource: Resource, **kwargs):
+async def ability(resource: Resource, **kwargs) -> Ability:
     """Quick ability lookup.
 
     See https://pokeapi.co/docsv2/#abilities for attributes and more detailed

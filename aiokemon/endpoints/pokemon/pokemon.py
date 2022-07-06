@@ -1,7 +1,7 @@
 from typing import List
 
 from aiokemon.core.api import APIResource
-from aiokemon.endpoints.common import NamedAPIResource, GenerationGameIndex
+from aiokemon.endpoints.common import NamedAPIResource, VersionGameIndex
 from aiokemon.endpoints.sprite import PokemonSprites
 
 
@@ -67,7 +67,7 @@ class Pokemon(APIResource):
     weight: int
     abilities: List[PokemonAbility]
     forms: List[NamedAPIResource]
-    game_indices: List[GenerationGameIndex]
+    game_indices: List[VersionGameIndex]
     held_items: List[PokemonHeldItem]
     location_area_encounters: str
     moves: List[PokemonMove]
@@ -75,4 +75,4 @@ class Pokemon(APIResource):
     sprites: PokemonSprites
     species: NamedAPIResource
     stats: List[PokemonStat]
-    types: List[NamedAPIResource]
+    types: List[PokemonType]

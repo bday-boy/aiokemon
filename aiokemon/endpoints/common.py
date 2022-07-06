@@ -3,7 +3,7 @@ from aiokemon.core.api import APIMetaData
 
 
 class APIResource:
-    """A class wrapper for just a URL."""
+    """Basically a wrapper for just a URL."""
     url: str
 
 
