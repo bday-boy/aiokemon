@@ -7,6 +7,14 @@ Note that some of the type hinting of this file is a bit misleading. For
 example, the pokemon() function doesn't actually return an instance of
 class Pokemon, it returns an APIResource. However, once that APIResource is
 loaded, all of the attributes hinted in the Pokemon class should be populated.
+
+TODO: Add custom loading for:
+item.baby_trigger_for
+move.contest_effect
+move.super_contest_effect
+pokemon.location_area_encounters
+pokemon_species.evolution_chain
+stat.characteristics
 """
 
 from aiokemon.core.api import get_resource, get_subresource
