@@ -62,8 +62,10 @@ However, there are some important things to note about the type hinting:
 - Only each endpoint's specific wrapper function will return a class with the
   included attributes.
 - The type hinting is achieved by creating empty classes with typed instance
-  variables. In other words, the classes returned from the wrapper functions
-  aren't actually 
+  variables. However, despite the hinting, every instance of a resource is
+  just a PokeAPIResource class. So the class attributes are more or less a
+  lie, but all of the attributes *should* be present once the instance is
+  loaded.
 - All type hinting classes are scraped from the PokéAPI docs page. However,
   the docs page actually has some errors. For example, in the
   [pokemon sprites](https://pokeapi.co/docs/v2#pokemonsprites) resource
