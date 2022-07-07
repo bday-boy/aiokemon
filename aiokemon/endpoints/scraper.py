@@ -86,9 +86,7 @@ def parse_table(table: BeautifulSoup) -> str:
     return '\n'.join(table_text)
 
 
-def gen_tables(soup: BeautifulSoup, resource_name: str
-               ) -> Generator[BeautifulSoup, None, None]:
-    resource_header = soup.find(id=resource_name)
+def gen_tables(resource_header: BeautifulSoup) -> Generator[BeautifulSoup, None, None]:
     node = resource_header.next_sibling
     while node and node.name != 'h3':
         if node.name == 'h4' and node.attrs.get('id'):
@@ -101,7 +99,7 @@ def gen_tables(soup: BeautifulSoup, resource_name: str
         node = node.next_sibling
 
 
-def parse_resource(soup: BeautifulSoup, resource_name: str) -> str:
+def parse_resource(resource_header: BeautifulSoup) -> str:
     file_text = (
         '# This file was generated automatically.\n'
         'from typing import List\n\n'
@@ -109,7 +107,7 @@ def parse_resource(soup: BeautifulSoup, resource_name: str) -> str:
         'from aiokemon.endpoints.common import *\n\n\n'
     )
     class_declarations = []
-    for table in gen_tables(soup, resource_name):
+    for table in gen_tables(resource_header):
         class_declarations.append(parse_table(table))
     resource_class = class_declarations.pop(0)
     class_declarations = really_lazy_sort(class_declarations)
@@ -119,7 +117,32 @@ def parse_resource(soup: BeautifulSoup, resource_name: str) -> str:
         + fix_resource_class(resource_class)
         + '\n'
     )
-    return file_text
+    main_class = class_declaration_header.search(resource_class).group(1)
+    return file_text, main_class
+
+
+def parse_section(section_header: BeautifulSoup) -> None:
+    dir_name = '_'.join(section_header["id"].split('-')[:-1])
+    cur_dir = os.path.join('.', 'scraper', dir_name)
+    if not os.path.isdir(cur_dir):
+        os.mkdir(cur_dir)
+    
+    node = section_header.next_sibling
+    while node and node.name != 'h2':
+        if node.name == 'h3':
+            file_name = non_alpha.sub('_', node['id'].lower())
+            file_text, main_class = parse_resource(node)
+            with open(os.path.join(cur_dir, f'{file_name}.py'), 'w') as f:
+                f.write(file_text)
+            with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
+                f.write(
+                    f'from aiokemon.endpoints.{dir_name}.{file_name} '
+                    f'import {main_class}\n'
+                )
+        node = node.next_sibling
+    
+    with open(os.path.join('.', 'scraper', '__init__.py'), 'a') as f:
+        f.write(f'from aiokemon.endpoints.{dir_name} import *\n')
 
 
 def main():
@@ -128,23 +151,14 @@ def main():
 
     if not os.path.isdir('./scraper'):
         os.mkdir('./scraper')
-    resource_dirs = [
-        ''.join(h2.attrs['id'].split('-')[:-1]) for h2 in soup.find_all('h2')
-        if h2.attrs.get('id', '').endswith('-section')
-    ]
-    for resource_dir in resource_dirs:
-        cur_dir = f'./scraper/{resource_dir}'
-        if not os.path.isdir(cur_dir):
-            os.mkdir(cur_dir)
 
-    all_resources = [
-        h3.attrs['id'] for h3 in soup.find_all('h3')
-    ]
-    print(all_resources)
-    for resource in all_resources:
-        resource_text = parse_resource(soup, resource)
-        with open(f'./scraper/{resource}.py', 'w') as f:
-            f.write(resource_text)
+    # Ignore Resource Lists/Pagination section for now
+    section_headers = soup.find_all(
+        'h2', id=re.compile('(?<!resource-listspagination)-section')
+    )
+
+    for section_header in section_headers:
+        parse_section(section_header)
 
 
 if __name__ == '__main__':
