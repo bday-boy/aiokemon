@@ -1,4 +1,3 @@
-import asyncio
 from typing import Any, List, Optional, Union
 
 import aiokemon.core.common as cmn
@@ -10,7 +9,7 @@ class APIMetaData:
     """Forward declaration for type hinting."""
 
 
-class APIResource:
+class PokeAPIResource:
     """Class-attribute-based wrapper for an API. Initializes all dictionary
     key-value pairs from a JSON response as class attributes.
 
@@ -107,7 +106,7 @@ class APIMetaData:
         ]
 
     async def as_resource(self, raise_error: bool = False,
-                          **kwargs) -> APIResource:
+                          **kwargs) -> PokeAPIResource:
         """Creates a new APIResource based on the URL from this class."""
         if getattr(self, 'url', False):
             endpoint, resource = cmn.break_url(self.url)
@@ -145,9 +144,9 @@ def sanitize_data(data: dict) -> dict:
 
 
 async def get_resource(endpoint: str, resource: Resource,
-                       **kwargs) -> APIResource:
+                       **kwargs) -> PokeAPIResource:
     """Async wrapper function for creating a new APIResource instance."""
-    apiresource = APIResource(endpoint, resource, **kwargs)
+    apiresource = PokeAPIResource(endpoint, resource, **kwargs)
     await apiresource._load()
     return apiresource
 

@@ -1,4 +1,4 @@
-from aiokemon.core.api import APIResource, get_resource
+from aiokemon.core.api import PokeAPIResource, get_resource
 from aiokemon.core.common import get_resource_id
 from aiokemon.core.loaders import *
 from aiokemon.endpoints.pokemon.pokemon import Pokemon
@@ -6,7 +6,7 @@ from aiokemon.endpoints.pokemon.types import Type
 
 __all__ = [
     # Broad API functionality
-    'APIResource',
+    'PokeAPIResource',
     'get_resource',
     'get_resource_id',
 

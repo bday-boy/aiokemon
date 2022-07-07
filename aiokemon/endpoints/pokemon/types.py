@@ -1,6 +1,6 @@
 from typing import List
 
-from aiokemon.core.api import APIResource
+from aiokemon.core.api import PokeAPIResource
 from aiokemon.endpoints.common import NamedAPIResource, GenerationGameIndex, \
     Name
 
@@ -27,7 +27,7 @@ class TypeRelationsPast:
     generation: NamedAPIResource
 
 
-class Type(APIResource):
+class Type(PokeAPIResource):
     """A type endpoint resource."""
     id: int
     name: str

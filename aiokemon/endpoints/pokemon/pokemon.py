@@ -1,6 +1,6 @@
 from typing import List
 
-from aiokemon.core.api import APIResource
+from aiokemon.core.api import PokeAPIResource
 from aiokemon.endpoints.common import NamedAPIResource, VersionGameIndex
 from aiokemon.endpoints.sprite import PokemonSprites
 
@@ -56,7 +56,7 @@ class PokemonTypePast:
     types: List[PokemonType]
 
 
-class Pokemon(APIResource):
+class Pokemon(PokeAPIResource):
     """A pokemon endpoint resource."""
     id: int
     name: str

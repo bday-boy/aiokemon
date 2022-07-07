@@ -1,6 +1,6 @@
 from typing import List
 
-from aiokemon.core.api import APIResource
+from aiokemon.core.api import PokeAPIResource
 from aiokemon.endpoints.common import NamedAPIResource, Name, VerboseEffect, \
     Effect
 
@@ -25,7 +25,7 @@ class AbilityPokemon:
     pokemon: NamedAPIResource
 
 
-class Ability(APIResource):
+class Ability(PokeAPIResource):
     """An ability endpoint resource."""
     id: int
     name: str
