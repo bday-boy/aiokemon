@@ -28,6 +28,9 @@ endpoints_dir = './aiokemon/endpoints'
 
 
 def really_lazy_sort(classes: List[str]) -> List[str]:
+    """Sorts a list of class declarations so that each class's dependencies
+    are declared before it.
+    """
     # Get set of all classes used in each class
     classes_in_classes = deque(
         (class_, set(classname.findall(class_)))
@@ -56,16 +59,23 @@ def really_lazy_sort(classes: List[str]) -> List[str]:
 
 
 def all_from_list(all_list: List) -> List:
+    """Formats an __all__ list so it can be written into a file."""
     all_formatted = ',\n    '.join(f"'{entry}'" for entry in all_list)
     return f'\n__all__ = [\n    {all_formatted}\n]\n'
 
 
-def fix_resource_class(class_decl: str) -> str:
-    index = class_declaration_header.search(class_decl).span(0)[1]
-    return f'{class_decl[:index]}(PokeAPIResource){class_decl[index:]}'
+def fix_resource_class(main_class: str) -> str:
+    """Inserts "(PokeAPIResource)" into the main class declaration of a
+    resource.
+    """
+    index = class_declaration_header.search(main_class).span(0)[1]
+    return f'{main_class[:index]}(PokeAPIResource){main_class[index:]}'
 
 
 def fix_name(td: BeautifulSoup) -> str:
+    """Parses a table cell as a class attribute. Adds a trailing underscore
+    to Python keywords.
+    """
     name = td.text
     if keyword.iskeyword(name):
         return f'{name}_'
@@ -74,6 +84,7 @@ def fix_name(td: BeautifulSoup) -> str:
 
 
 def fix_type(td: BeautifulSoup) -> str:
+    """Parses a table cell as a type declaration."""
     i = td.find('i')
     if i is None:
         return td.text
@@ -86,13 +97,15 @@ def fix_type(td: BeautifulSoup) -> str:
 
 
 def parse_row(row: BeautifulSoup) -> str:
+    """Converts a single row into a name-type pair."""
     cells = row.find_all('td')
     name = fix_name(cells[0])
-    type_ = fix_type(cells[-1])
+    type_ = fix_type(cells[2])
     return f'    {name}: {type_}'
 
 
 def parse_table(table: BeautifulSoup) -> str:
+    """Converts a table into a class declaration as a string."""
     table_text = [f'class {table.previous_sibling.text.split(" ")[0]}:']
     rows = table.find('tbody').find_all('tr')
     for row in rows:
@@ -100,7 +113,12 @@ def parse_table(table: BeautifulSoup) -> str:
     return '\n'.join(table_text)
 
 
-def gen_tables(resource_header: BeautifulSoup) -> Generator[BeautifulSoup, None, None]:
+def gen_tables(resource_header: BeautifulSoup
+               ) -> Generator[BeautifulSoup, None, None]:
+    """Gets all the tables in a resource section. Starts at the resource
+    header and ends when no siblings or left or when another resource header
+    is encountered.
+    """
     node = resource_header.next_sibling
     while node and node.name != 'h3':
         if node.name == 'h4' and node.attrs.get('id'):
@@ -108,17 +126,20 @@ def gen_tables(resource_header: BeautifulSoup) -> Generator[BeautifulSoup, None,
             if node.name == 'table':
                 yield node
             else:
+                # PokeAPI always seems to have an h4 followed by a table, so
+                # if we didn't get a table, then there's some sort of exception
                 print('Some weird formatting occurred.')
                 print(node.prettify())
         node = node.next_sibling
 
 
 def parse_resource(resource_header: BeautifulSoup) -> str:
+    """Parses all of the tables in a single resource."""
     file_text = (
         '# This file was generated automatically.\n'
         'from typing import List\n\n'
         'from aiokemon.core.api import PokeAPIResource\n'
-        'from aiokemon.endpoints.common import *\n\n\n'
+        'from aiokemon.endpoints.utility.common_models import *\n\n\n'
     )
     class_declarations = []
     for table in gen_tables(resource_header):
@@ -136,8 +157,11 @@ def parse_resource(resource_header: BeautifulSoup) -> str:
 
 
 def parse_section(section_header: BeautifulSoup) -> str:
-    dir_name = '_'.join(section_header["id"].split('-')[:-1])
-    cur_dir = os.path.join('.', endpoints_dir, dir_name)
+    """Parse all of the endpoints in a given section. Each endpoint becomes
+    a Python module and the section becomes a package.
+    """
+    pkg_name = '_'.join(section_header["id"].split('-')[:-1])
+    cur_dir = os.path.join('.', endpoints_dir, pkg_name)
     if not os.path.isdir(cur_dir):
         os.mkdir(cur_dir)
 
@@ -145,20 +169,28 @@ def parse_section(section_header: BeautifulSoup) -> str:
     node = section_header.next_sibling
     while node and node.name != 'h2':
         if node.name == 'h3':
-            file_name = non_alpha.sub('_', node['id'].lower())
+            module_name = non_alpha.sub('_', node['id'].lower())
             file_text, main_class = parse_resource(node)
-            with open(os.path.join(cur_dir, f'{file_name}.py'), 'w') as f:
+
+            # Write the class declarations to our module
+            with open(os.path.join(cur_dir, f'{module_name}.py'), 'w') as f:
                 f.write(file_text)
+
+            # Import the main class into our __init__.py file
             with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
                 f.write(
-                    f'from aiokemon.endpoints.{dir_name}.{file_name} '
+                    f'from aiokemon.endpoints.{pkg_name}.{module_name} '
                     f'import {main_class}\n'
                 )
             section_classes.append(main_class)
         node = node.next_sibling
 
+    # Import all main classes from our current package into the top-level
+    # endpoints __init__.py file
     with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
-        f.write(f'from aiokemon.endpoints.{dir_name} import *\n')
+        f.write(f'from aiokemon.endpoints.{pkg_name} import *\n')
+    
+    # Add the __all__ array to our current package's __init__.py
     with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
         f.write(all_from_list(section_classes))
     return section_classes
