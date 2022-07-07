@@ -4,7 +4,7 @@
 
 __aiokemon__ is an asynchronous Python wrapper for making PokéAPI requests.
 
-It took a lot of inspiration from
+It took a *lot* of inspiration from
 [Pokebase](https://github.com/PokeAPI/pokebase), so huge thanks to everyone
 who contributed to that project. I only didn't make a fork because enough of
 the code base is different that refactoring it would've been more effort than
@@ -35,7 +35,9 @@ For example, if we want to get a Pokémon:
 >>> breloom.abilities[0].ability.name
 'effect-spore'
 >>> breloom.attrs # shows PokéAPI data attributes
-['abilities', 'base_experience', 'forms', 'game_indices', 'height', 'held_items', 'id', 'is_default', 'location_area_encounters', 'moves', 'name', 'order', 'past_types', 'species', 'sprites', 'stats', 'types', 'url', 'weight']
+['abilities', 'base_experience', 'forms', 'game_indices', 'height',
+'held_items', 'id', 'is_default', 'location_area_encounters', 'moves', 'name',
+'order', 'past_types', 'species', 'sprites', 'stats', 'types', 'url', 'weight']
 ```
 
 Suppose we decide to get one of its moves as well:
@@ -48,7 +50,9 @@ Suppose we decide to get one of its moves as well:
 'selected-pokemon'
 ```
 
-And it's as easy as that.
+And it's as easy as that. However, if you want to get type hinting
+for Mega Punch, then you should do `ak.move(breloom.moves[0].move.name)`
+instead.
 
 ### Type Hinting
 
@@ -66,19 +70,14 @@ However, there are some important things to note about the type hinting:
   just a PokeAPIResource class. So the class attributes are more or less a
   lie, but all of the attributes *should* be present once the instance is
   loaded.
-- All type hinting classes are scraped from the PokéAPI docs page. However,
-  the docs page actually has some errors. For example, in the
-  [pokemon sprites](https://pokeapi.co/docs/v2#pokemonsprites) resource
-  (this link has an element ID in it but doesn't actually scroll, so on
-  the page sidebar just click Pokemon -> Pokemon and scroll a bit to
-  PokemonSprites), it says all fields can be strings. However, Pokemon with
+- All type hinting classes are scraped and automatically generated from the
+  PokéAPI docs page. However, the docs page actually has some errors. For
+  example, in the [PokemonSprites](https://pokeapi.co/docs/v2#pokemonsprites)
+  type, it says all attributes are only strings. However, Pokemon with
   only one gender or no gender will have `None` for all the *_female entries,
-  so expecting an empty string and calling `str`-specific functions on it will
-  raise an `AttributeError`.
-
-That being said, in the original usage example, if you want to get type hinting
-for Mega Punch, then you should do `ak.move(breloom.moves[0].move.name)`
-instead.
+  so expecting only a string and calling `str`-specific functions on it will
+  raise an `AttributeError`. Furthermore, PokemonSprites is missing quite a
+  bit of type hinting.
 
 ## Key Differences From Pokebase
 
