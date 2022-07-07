@@ -1,32 +1,28 @@
+# This file was generated automatically.
 from typing import List
 
 from aiokemon.core.api import PokeAPIResource
-from aiokemon.endpoints.common import NamedAPIResource, Name, VerboseEffect, \
-    Effect
-
-
-class AbilityEffectChange:
-    """Effects caused by a given ability."""
-    effect_entries: List[Effect]
-    version_group: NamedAPIResource
-
-
-class AbilityFlavorText:
-    """Flavor text for an ability in a version group in a given language."""
-    flavor_text: str
-    language: NamedAPIResource
-    version_group: NamedAPIResource
+from aiokemon.endpoints.common import *
 
 
 class AbilityPokemon:
-    """Information for a Pokemon that has the given ability."""
     is_hidden: bool
     slot: int
     pokemon: NamedAPIResource
 
 
+class AbilityFlavorText:
+    flavor_text: str
+    language: NamedAPIResource
+    version_group: NamedAPIResource
+
+
+class AbilityEffectChange:
+    effect_entries: List[Effect]
+    version_group: NamedAPIResource
+
+
 class Ability(PokeAPIResource):
-    """An ability endpoint resource."""
     id: int
     name: str
     is_main_series: bool

@@ -1,17 +1,13 @@
+# This file was generated automatically.
 from typing import List
 
 from aiokemon.core.api import PokeAPIResource
-from aiokemon.endpoints.common import APIResource, Description, FlavorText, NamedAPIResource, Name
+from aiokemon.endpoints.common import *
 
 
-class Genus:
-    entry_number: int
-    pokedex: NamedAPIResource
-
-
-class PokemonSpeciesDexEntry:
-    entry_number: int
-    pokedex: NamedAPIResource
+class PokemonSpeciesVariety:
+    is_default: bool
+    pokemon: NamedAPIResource
 
 
 class PalParkEncounterArea:
@@ -20,13 +16,17 @@ class PalParkEncounterArea:
     area: NamedAPIResource
 
 
-class PokemonSpeciesVariety:
-    is_default: bool
-    pokemon: NamedAPIResource
+class PokemonSpeciesDexEntry:
+    entry_number: int
+    pokedex: NamedAPIResource
+
+
+class Genus:
+    genus: str
+    language: NamedAPIResource
 
 
 class PokemonSpecies(PokeAPIResource):
-    """A pokemon species endpoint resource."""
     id: int
     name: str
     order: int

@@ -1,63 +1,70 @@
+# This file was generated automatically.
 from typing import List
 
 from aiokemon.core.api import PokeAPIResource
-from aiokemon.endpoints.common import NamedAPIResource, VersionGameIndex
-from aiokemon.endpoints.sprite import PokemonSprites
+from aiokemon.endpoints.common import *
 
 
-class PokemonAbility:
-    """An ability entry in a Pokemon's abilities array."""
-    is_hidden: bool
+class PokemonType:
     slot: int
-    ability: NamedAPIResource
+    type: NamedAPIResource
 
 
-class PokemonHeldItemVersion:
-    """A single version_details entry."""
-    version: NamedAPIResource
-    rarity: int
+class PokemonSprites:
+    front_default: str
+    front_shiny: str
+    front_female: str
+    front_shiny_female: str
+    back_default: str
+    back_shiny: str
+    back_female: str
+    back_shiny_female: str
 
 
-class PokemonHeldItem:
-    """A held item entry in a Pokemon's held_items array."""
-    item: NamedAPIResource
-    version_details: List[PokemonHeldItemVersion]
+class PokemonStat:
+    stat: NamedAPIResource
+    effort: int
+    base_stat: int
 
 
 class PokemonMoveVersion:
-    """A version group detail entry in a move's version_group_details array."""
     move_learn_method: NamedAPIResource
     version_group: NamedAPIResource
     level_learned_at: int
 
 
 class PokemonMove:
-    """A move entry in a Pokemon's moves array."""
     move: NamedAPIResource
     version_group_details: List[PokemonMoveVersion]
 
 
-class PokemonStat:
-    """A stat entry in a Pokemon's stats array."""
-    stat: NamedAPIResource
-    effort: int
-    base_stat: int
+class PokemonHeldItemVersion:
+    version: NamedAPIResource
+    rarity: int
 
 
-class PokemonType:
-    """A type entry in a Pokemon's types array."""
-    slot: int
-    type: NamedAPIResource
+class PokemonHeldItem:
+    item: NamedAPIResource
+    version_details: List[PokemonHeldItemVersion]
 
 
 class PokemonTypePast:
-    """A Pokemon's past types."""
     generation: NamedAPIResource
     types: List[PokemonType]
 
 
+class PokemonFormType:
+    slot: int
+    type: NamedAPIResource
+
+
+class PokemonAbility:
+    is_hidden: bool
+    slot: int
+    ability: NamedAPIResource
+
+
 class Pokemon(PokeAPIResource):
-    """A pokemon endpoint resource."""
     id: int
     name: str
     base_experience: int

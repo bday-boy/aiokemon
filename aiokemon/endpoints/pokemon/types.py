@@ -1,34 +1,30 @@
+# This file was generated automatically.
 from typing import List
 
 from aiokemon.core.api import PokeAPIResource
-from aiokemon.endpoints.common import NamedAPIResource, GenerationGameIndex, \
-    Name
+from aiokemon.endpoints.common import *
+
+
+class TypeRelations:
+    no_damage_to: List[NamedAPIResource]
+    half_damage_to: List[NamedAPIResource]
+    double_damage_to: List[NamedAPIResource]
+    no_damage_from: List[NamedAPIResource]
+    half_damage_from: List[NamedAPIResource]
+    double_damage_from: List[NamedAPIResource]
+
+
+class TypeRelationsPast:
+    generation: NamedAPIResource
+    damage_relations: TypeRelations
 
 
 class TypePokemon:
-    """A single Pokemon and their type slot."""
     slot: int
     pokemon: NamedAPIResource
 
 
-class TypeRelations:
-    """A type's damage_relations."""
-    double_damage_from: List[NamedAPIResource]
-    double_damage_to: List[NamedAPIResource]
-    half_damage_from: List[NamedAPIResource]
-    half_damage_to: List[NamedAPIResource]
-    no_damage_from: List[NamedAPIResource]
-    no_damage_to: List[NamedAPIResource]
-
-
-class TypeRelationsPast:
-    """The damage_relations for a previous generation."""
-    damage_relations: TypeRelations
-    generation: NamedAPIResource
-
-
 class Type(PokeAPIResource):
-    """A type endpoint resource."""
     id: int
     name: str
     damage_relations: TypeRelations
