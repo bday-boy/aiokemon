@@ -8,6 +8,7 @@ from aiokemon.endpoints.locations import *
 from aiokemon.endpoints.machines import *
 from aiokemon.endpoints.moves import *
 from aiokemon.endpoints.pokemon import *
+from aiokemon.endpoints.utility import *
 
 __all__ = [
     'Berry',
@@ -57,5 +58,6 @@ __all__ = [
     'PokemonShape',
     'PokemonSpecies',
     'Stat',
-    'Type'
+    'Type',
+    'Language'
 ]

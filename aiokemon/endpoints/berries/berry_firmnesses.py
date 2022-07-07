@@ -2,7 +2,7 @@
 from typing import List
 
 from aiokemon.core.api import PokeAPIResource
-from aiokemon.endpoints.common import *
+from aiokemon.endpoints.utility.common_models import *
 
 
 class BerryFirmness(PokeAPIResource):

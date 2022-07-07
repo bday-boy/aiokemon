@@ -1,6 +1,8 @@
 """
 This file is used to scrape the PokeAPI docs page for type-hinting purposes.
 Python modules are then generated and put into the endpoints directory.
+The code is ugly but idc it gets the job done lmao web scraping isn't exactly
+very pretty anyway
 
 Packages this file uses: beautifulsoup4, requests
 """
