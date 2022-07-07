@@ -1,4 +1,10 @@
-# Packages this file uses: beautifulsoup4, requests
+"""
+This file is used to scrape the PokeAPI docs page for type-hinting purposes.
+Python modules are then generated and put into the endpoints directory.
+
+Packages this file uses: beautifulsoup4, requests
+"""
+
 import keyword
 import os
 import re
@@ -14,8 +20,9 @@ type_map = {
     'string': 'str'
 }
 non_alpha = re.compile(r'[^a-z]')
-class_declaration_header= re.compile(r'class ((?:[A-Z][a-zA-Z]*)+)')
+class_declaration_header = re.compile(r'class ((?:[A-Z][a-zA-Z]*)+)')
 classname = re.compile(r'([A-Z][a-zA-Z]*)+')
+endpoints_dir = './aiokemon/endpoints'
 
 
 def really_lazy_sort(classes: List[str]) -> List[str]:
@@ -121,12 +128,13 @@ def parse_resource(resource_header: BeautifulSoup) -> str:
     return file_text, main_class
 
 
-def parse_section(section_header: BeautifulSoup) -> None:
+def parse_section(section_header: BeautifulSoup) -> str:
     dir_name = '_'.join(section_header["id"].split('-')[:-1])
-    cur_dir = os.path.join('.', 'scraper', dir_name)
+    cur_dir = os.path.join('.', endpoints_dir, dir_name)
     if not os.path.isdir(cur_dir):
         os.mkdir(cur_dir)
-    
+
+    section_classes = []
     node = section_header.next_sibling
     while node and node.name != 'h2':
         if node.name == 'h3':
@@ -139,26 +147,43 @@ def parse_section(section_header: BeautifulSoup) -> None:
                     f'from aiokemon.endpoints.{dir_name}.{file_name} '
                     f'import {main_class}\n'
                 )
+            section_classes.append(main_class)
         node = node.next_sibling
-    
-    with open(os.path.join('.', 'scraper', '__init__.py'), 'a') as f:
+
+    with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
         f.write(f'from aiokemon.endpoints.{dir_name} import *\n')
+    with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
+        all_entries = '\n'.join(f"    '{cls}'" for cls in section_classes)
+        f.write(
+            f'\n__all__ = [\n{all_entries}\n]\n'
+        )
+    return section_classes
 
 
 def main():
     html_doc = requests.get('https://pokeapi.co/docs/v2').text
     soup = BeautifulSoup(html_doc, 'html.parser')
 
-    if not os.path.isdir('./scraper'):
-        os.mkdir('./scraper')
+    if not os.path.isdir(endpoints_dir):
+        os.mkdir(endpoints_dir)
 
-    # Ignore Resource Lists/Pagination section for now
     section_headers = soup.find_all(
-        'h2', id=re.compile('(?<!resource-listspagination)-section')
+        'h2', id=re.compile('.+-section')
     )
 
+    # Ignore Resource Lists/Pagination and Utility sections for now
+    section_headers.pop(0)
+    section_headers.pop(-1)
+
+    all_resource_classes = []
     for section_header in section_headers:
-        parse_section(section_header)
+        all_resource_classes.extend(parse_section(section_header))
+    
+    with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
+        all_entries = '\n'.join(f"    '{cls}'" for cls in all_resource_classes)
+        f.write(
+            f'\n__all__ = [\n{all_entries}\n]\n'
+        )
 
 
 if __name__ == '__main__':
