@@ -50,22 +50,31 @@ Suppose we decide to get one of its moves as well:
 
 And it's as easy as that.
 
-### Important Note About Type Hinting
+### Type Hinting
 
 While still in development, aiokemon has support for fully type-hinted
 resources. Here is an example in VSCode:
 
 ![Pokemon endpoint type hint example](./images/type%20hinting%20example.png)
 
-However, the important thing to note about the type hinting is that only
-each endpoint's specific wrapper function will return a class with the
-included attributes. Another important note is that the attributes are more or
-less a lie. The type hinting is achieved by creating empty classes with
-typed instance variables to match what each resource has on PokéAPI. While
-they *should* all be present, it's entirely possible that a resource may be
-missing something, or that I messed up the hinting somewhere.
+However, there are some important things to note about the type hinting:
 
-That being said, in the origina usage example, if you want to get type hinting
+- Only each endpoint's specific wrapper function will return a class with the
+  included attributes.
+- The type hinting is achieved by creating empty classes with typed instance
+  variables. In other words, the classes returned from the wrapper functions
+  aren't actually 
+- All type hinting classes are scraped from the PokéAPI docs page. However,
+  the docs page actually has some errors. For example, in the
+  [pokemon sprites](https://pokeapi.co/docs/v2#pokemonsprites) resource
+  (this link has an element ID in it but doesn't actually scroll, so on
+  the page sidebar just click Pokemon -> Pokemon and scroll a bit to
+  PokemonSprites), it says all fields can be strings. However, Pokemon with
+  only one gender or no gender will have `None` for all the *_female entries,
+  so expecting an empty string and calling `str`-specific functions on it will
+  raise an `AttributeError`.
+
+That being said, in the original usage example, if you want to get type hinting
 for Mega Punch, then you should do `ak.move(breloom.moves[0].move.name)`
 instead.
 
@@ -128,8 +137,8 @@ a person searching for move information through a Discord bot).
 
 ## Development Status
 
-Version 1.0 "works." I haven't figured out Python unit tests yet, so it could
-be buggy garbage for all I know.
+Version 1.0.0 "works." I haven't figured out Python unit tests yet, so it
+could be buggy garbage for all I know.
 
 ## Installation
 
