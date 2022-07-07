@@ -455,7 +455,7 @@ async def type_(resource: Resource, **kwargs) -> Type:
     return await get_resource("type", resource, **kwargs)
 
 
-async def language(resource: Resource, **kwargs):
+async def language(resource: Resource, **kwargs) -> Language:
     """Quick language lookup.
 
     See https://pokeapi.co/docsv2/#languages for attributes and more detailed
