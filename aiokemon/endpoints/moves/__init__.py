@@ -7,11 +7,11 @@ from aiokemon.endpoints.moves.move_learn_methods import MoveLearnMethod
 from aiokemon.endpoints.moves.move_targets import MoveTarget
 
 __all__ = [
-    'Move'
-    'MoveAilment'
-    'MoveBattleStyle'
-    'MoveCategory'
-    'MoveDamageClass'
-    'MoveLearnMethod'
+    'Move',
+    'MoveAilment',
+    'MoveBattleStyle',
+    'MoveCategory',
+    'MoveDamageClass',
+    'MoveLearnMethod',
     'MoveTarget'
 ]

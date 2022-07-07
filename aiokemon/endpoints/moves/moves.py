@@ -3,6 +3,7 @@ from typing import List
 
 from aiokemon.core.api import PokeAPIResource
 from aiokemon.endpoints.common import *
+from aiokemon.endpoints.pokemon.abilities import AbilityEffectChange
 
 
 class PastMoveStatValues:

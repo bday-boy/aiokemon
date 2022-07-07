@@ -4,8 +4,8 @@ from aiokemon.endpoints.locations.pal_park_areas import PalParkArea
 from aiokemon.endpoints.locations.regions import Region
 
 __all__ = [
-    'Location'
-    'LocationArea'
-    'PalParkArea'
+    'Location',
+    'LocationArea',
+    'PalParkArea',
     'Region'
 ]

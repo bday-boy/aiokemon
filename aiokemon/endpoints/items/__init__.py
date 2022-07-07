@@ -5,9 +5,9 @@ from aiokemon.endpoints.items.item_fling_effects import ItemFlingEffect
 from aiokemon.endpoints.items.item_pockets import ItemPocket
 
 __all__ = [
-    'Item'
-    'ItemAttribute'
-    'ItemCategory'
-    'ItemFlingEffect'
+    'Item',
+    'ItemAttribute',
+    'ItemCategory',
+    'ItemFlingEffect',
     'ItemPocket'
 ]

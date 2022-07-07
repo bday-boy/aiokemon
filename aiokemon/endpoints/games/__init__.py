@@ -4,8 +4,8 @@ from aiokemon.endpoints.games.version import Version
 from aiokemon.endpoints.games.version_groups import VersionGroup
 
 __all__ = [
-    'Generation'
-    'Pokedex'
-    'Version'
+    'Generation',
+    'Pokedex',
+    'Version',
     'VersionGroup'
 ]

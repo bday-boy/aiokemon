@@ -19,9 +19,7 @@ stat.characteristics
 
 from aiokemon.core.api import get_resource, get_subresource
 from aiokemon.core.common import Resource
-from aiokemon.endpoints.pokemon.abilities import Ability
-from aiokemon.endpoints.pokemon.types import Type
-from aiokemon.endpoints.pokemon.pokemon import Pokemon
+from aiokemon.endpoints import *
 
 
 async def berry(resource: Resource, **kwargs):

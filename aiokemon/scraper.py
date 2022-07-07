@@ -53,6 +53,11 @@ def really_lazy_sort(classes: List[str]) -> List[str]:
     return sorted_classes
 
 
+def all_from_list(all_list: List) -> List:
+    all_formatted = ',\n    '.join(f"'{entry}'" for entry in all_list)
+    return f'\n__all__ = [\n    {all_formatted}\n]\n'
+
+
 def fix_resource_class(class_decl: str) -> str:
     index = class_declaration_header.search(class_decl).span(0)[1]
     return f'{class_decl[:index]}(PokeAPIResource){class_decl[index:]}'
@@ -153,10 +158,7 @@ def parse_section(section_header: BeautifulSoup) -> str:
     with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
         f.write(f'from aiokemon.endpoints.{dir_name} import *\n')
     with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
-        all_entries = '\n'.join(f"    '{cls}'" for cls in section_classes)
-        f.write(
-            f'\n__all__ = [\n{all_entries}\n]\n'
-        )
+        f.write(all_from_list(section_classes))
     return section_classes
 
 
@@ -180,10 +182,7 @@ def main():
         all_resource_classes.extend(parse_section(section_header))
     
     with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
-        all_entries = '\n'.join(f"    '{cls}'" for cls in all_resource_classes)
-        f.write(
-            f'\n__all__ = [\n{all_entries}\n]\n'
-        )
+        f.write(all_from_list(all_resource_classes))
 
 
 if __name__ == '__main__':

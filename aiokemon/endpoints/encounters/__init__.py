@@ -3,7 +3,7 @@ from aiokemon.endpoints.encounters.encounter_conditions import EncounterConditio
 from aiokemon.endpoints.encounters.encounter_condition_values import EncounterConditionValue
 
 __all__ = [
-    'EncounterMethod'
-    'EncounterCondition'
+    'EncounterMethod',
+    'EncounterCondition',
     'EncounterConditionValue'
 ]

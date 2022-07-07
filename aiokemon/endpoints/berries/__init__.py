@@ -3,7 +3,7 @@ from aiokemon.endpoints.berries.berry_firmnesses import BerryFirmness
 from aiokemon.endpoints.berries.berry_flavors import BerryFlavor
 
 __all__ = [
-    'Berry'
-    'BerryFirmness'
+    'Berry',
+    'BerryFirmness',
     'BerryFlavor'
 ]

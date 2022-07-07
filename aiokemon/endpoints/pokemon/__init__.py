@@ -16,20 +16,20 @@ from aiokemon.endpoints.pokemon.stats import Stat
 from aiokemon.endpoints.pokemon.types import Type
 
 __all__ = [
-    'Ability'
-    'Characteristic'
-    'EggGroup'
-    'Gender'
-    'GrowthRate'
-    'Nature'
-    'PokeathlonStat'
-    'Pokemon'
-    'LocationAreaEncounter'
-    'PokemonColor'
-    'PokemonForm'
-    'PokemonHabitat'
-    'PokemonShape'
-    'PokemonSpecies'
-    'Stat'
+    'Ability',
+    'Characteristic',
+    'EggGroup',
+    'Gender',
+    'GrowthRate',
+    'Nature',
+    'PokeathlonStat',
+    'Pokemon',
+    'LocationAreaEncounter',
+    'PokemonColor',
+    'PokemonForm',
+    'PokemonHabitat',
+    'PokemonShape',
+    'PokemonSpecies',
+    'Stat',
     'Type'
 ]
