@@ -5,7 +5,28 @@ import aiokemon.core.matcher as matcher
 from aiokemon.core.common import Resource
 
 
-class PokeAPIResource:
+class PokeAPIBase:
+    """Base class containing mostly convenience functions."""
+
+    def _safe_update(self, data: dict) -> None:
+        """Sanitizes all data keys so that they are valid Python
+        identifiers and converts all sub-dicts into APIMetaData and all
+        sub-lists into APIMetaData lists.
+        """
+        for k, v in data.items():
+            k = cmn.sanitize_attribute(k)
+            self.__dict__[k] = make_object(k, v)
+
+    @property
+    def attrs(self) -> List[str]:
+        """Returns all PokéAPI attributes of the class."""
+        return [
+            k for k in dir(self) if not k.startswith('_')
+            and k not in {'attrs', 'as_resource'}
+        ]
+
+
+class PokeAPIResource(PokeAPIBase):
     """Class-attribute-based wrapper for an API. Initializes all dictionary
     key-value pairs from a JSON response as class attributes.
 
@@ -28,7 +49,7 @@ class PokeAPIResource:
         only be guaranteed once the async function _load is awaited.
         """
         if custom is not None:
-            self.__dict__.update(custom)
+            self._safe_update(custom)
         self._endpoint = endpoint
         self._resource = resource
         self._loaded = False
@@ -38,14 +59,6 @@ class PokeAPIResource:
 
     def __repr__(self) -> str:
         return f'<{self._endpoint}-{self._resource}>'
-
-    @property
-    def attrs(self) -> List[str]:
-        """Returns all PokéAPI attributes of the class."""
-        return [
-            k for k in dir(self) if not k.startswith('_')
-            and k not in {'attrs'}
-        ]
 
     async def _load(self) -> None:
         """Asynchronously loads the information for the given resource
@@ -60,9 +73,7 @@ class PokeAPIResource:
         self.id = id_
 
         data = await cmn.get_by_resource(self._endpoint, self._resource)
-        sanitized_data = sanitize_data(data)
-
-        self.__dict__.update(sanitized_data)
+        self._safe_update(data)
         self._loaded = True
 
     @classmethod
@@ -74,12 +85,12 @@ class PokeAPIResource:
         return apiresource
 
 
-class APIMetaData:
-    """More simple class for when data doesn't need to be loaded."""
+class APIMetaData(PokeAPIBase):
+    """Simple class used for sub-dicts and -lists in a response JSON."""
 
     @staticmethod
-    def from_data(key: str, data: Union[dict, list]
-                  ) -> Union['APIMetaData', List['APIMetaData']]:
+    def _from_data(key: str, data: Union[dict, list]
+                   ) -> Union['APIMetaData', List['APIMetaData']]:
         if isinstance(data, dict):
             return APIMetaData(key, data)
         elif isinstance(data, list) \
@@ -92,22 +103,13 @@ class APIMetaData:
 
     def __init__(self, key: str, data: dict) -> None:
         self._key = key
-        sanitized_data = sanitize_data(data)
-        self.__dict__.update(sanitized_data)
+        self._safe_update(data)
 
     def __str__(self) -> str:
         return self._key
 
     def __repr__(self) -> str:
         return f'<APIMetaData object for key "{self._key}">'
-
-    @property
-    def attrs(self) -> List[str]:
-        """Returns all PokéAPI attributes of the class."""
-        return [
-            k for k in dir(self) if not k.startswith('_')
-            and k not in {'attrs', 'as_resource', 'from_data'}
-        ]
 
     async def as_resource(self, raise_error: bool = False,
                           **kwargs) -> PokeAPIResource:
@@ -130,27 +132,13 @@ def make_object(key: str, obj: Any) -> Any:
     APIMetaData objects and does nothing otherwise.
     """
     if isinstance(obj, (dict, list)):
-        return APIMetaData.from_data(key, obj)
+        return APIMetaData._from_data(key, obj)
     return obj
-
-
-def sanitize_data(data: dict) -> dict:
-    """Sanitizes a data dictionary so all of its keys can be added as
-    attributes to a class. Also converts any sub-dictionaries into
-    classes.
-    """
-    sanitized_data = {}
-
-    for k, v in data.items():
-        k = cmn.sanitize_attribute(k)
-        sanitized_data[k] = make_object(k, v)
-
-    return sanitized_data
 
 
 async def get_subresource(name: str, url: str
                           ) -> Union[APIMetaData, List[APIMetaData]]:
     """Async wrapper function for creating a new APIMetaData instance."""
     data = await cmn.get_by_url(url)
-    apimetadata = APIMetaData.from_data(name, data)
+    apimetadata = APIMetaData._from_data(name, data)
     return apimetadata
