@@ -8,9 +8,9 @@ Packages this file uses: beautifulsoup4, requests
 """
 
 import keyword
-import os
 import re
 from collections import deque
+from pathlib import Path
 from typing import Generator, List
 
 import requests
@@ -24,7 +24,7 @@ type_map = {
 non_alpha = re.compile(r'[^a-z]')
 class_declaration_header = re.compile(r'class ((?:[A-Z][a-zA-Z]*)+)')
 classname = re.compile(r'([A-Z][a-zA-Z]*)+')
-endpoints_dir = './aiokemon/endpoints'
+endpoints_dir = Path('.') / 'endpoints'
 
 
 def really_lazy_sort(classes: List[str]) -> List[str]:
@@ -161,9 +161,9 @@ def parse_section(section_header: BeautifulSoup) -> str:
     a Python module and the section becomes a package.
     """
     pkg_name = '_'.join(section_header["id"].split('-')[:-1])
-    cur_dir = os.path.join('.', endpoints_dir, pkg_name)
-    if not os.path.isdir(cur_dir):
-        os.mkdir(cur_dir)
+    pkg_dir = endpoints_dir / pkg_name
+    if not pkg_dir.is_dir():
+        pkg_dir.mkdir()
 
     section_classes = []
     node = section_header.next_sibling
@@ -173,11 +173,11 @@ def parse_section(section_header: BeautifulSoup) -> str:
             file_text, main_class = parse_resource(node)
 
             # Write the class declarations to our module
-            with open(os.path.join(cur_dir, f'{module_name}.py'), 'w') as f:
+            with (pkg_dir / f'{module_name}.py').open('w') as f:
                 f.write(file_text)
 
             # Import the main class into our __init__.py file
-            with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
+            with (pkg_dir / '__init__.py').open('a') as f:
                 f.write(
                     f'from aiokemon.endpoints.{pkg_name}.{module_name} '
                     f'import {main_class}\n'
@@ -187,12 +187,13 @@ def parse_section(section_header: BeautifulSoup) -> str:
 
     # Import all main classes from our current package into the top-level
     # endpoints __init__.py file
-    with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
+    with (endpoints_dir / '__init__.py').open('a') as f:
         f.write(f'from aiokemon.endpoints.{pkg_name} import *\n')
-    
+
     # Add the __all__ array to our current package's __init__.py
-    with open(os.path.join(cur_dir, '__init__.py'), 'a') as f:
+    with (pkg_dir / '__init__.py').open('a') as f:
         f.write(all_from_list(section_classes))
+
     return section_classes
 
 
@@ -200,8 +201,8 @@ def main():
     html_doc = requests.get('https://pokeapi.co/docs/v2').text
     soup = BeautifulSoup(html_doc, 'html.parser')
 
-    if not os.path.isdir(endpoints_dir):
-        os.mkdir(endpoints_dir)
+    if not endpoints_dir.is_dir():
+        endpoints_dir.mkdir()
 
     section_headers = soup.find_all(
         'h2', id=re.compile('.+-section')
@@ -214,8 +215,8 @@ def main():
     all_resource_classes = []
     for section_header in section_headers:
         all_resource_classes.extend(parse_section(section_header))
-    
-    with open(os.path.join('.', endpoints_dir, '__init__.py'), 'a') as f:
+
+    with (endpoints_dir / '__init__.py').open('a') as f:
         f.write(all_from_list(all_resource_classes))
 
 

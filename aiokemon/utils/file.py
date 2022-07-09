@@ -1,20 +1,20 @@
-import os
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
-home = os.path.expanduser('~')
+home = Path('~').expanduser()
 
 
-def make_cache() -> str:
+def make_cache() -> Union[str, Path]:
     """Creates a .cache directory at the user's home if one doesn't
     already exist.
 
     ## Raises
     `OSError` if the .cache directory couldn't be made.
     """
-    cache_dir = os.path.join(home, '.cache')
-    if not os.path.isdir(cache_dir):
-        os.mkdir(cache_dir)
-        if not os.path.isdir(cache_dir):
+    cache_dir = home / '.cache'
+    if not cache_dir.is_dir():
+        cache_dir.mkdir()
+        if not cache_dir.is_dir():
             raise OSError(
                 "couldn't create the .cache directory. Please create one "
                 "manually in your user's home directory."
@@ -29,4 +29,4 @@ def cache_file(cache_file: str, *, cache_dir: Optional[str] = None) -> str:
     """
     if cache_dir is None:
         cache_dir = make_cache()
-    return os.path.join(cache_dir, cache_file)
+    return str(cache_dir / cache_file)
