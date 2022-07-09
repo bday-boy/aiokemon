@@ -1,3 +1,34 @@
+"""
+# aiokemon
+
+aiokemon is an asynchronous Python wrapper for making PokéAPI requests.
+
+Here is a basic usage example of getting a Pokemon:
+
+```python
+>>> import aiokemon as ak
+>>> breloom = await ak.pokemon('breloom')
+>>> breloom
+<pokemon-breloom>
+>>> breloom.abilities[0].ability.name
+'effect-spore'
+>>> breloom.attrs # shows PokéAPI data attributes
+['abilities', 'base_experience', 'forms', 'game_indices', 'height',
+'held_items', 'id', 'is_default', 'location_area_encounters', 'moves', 'name',
+'order', 'past_types', 'species', 'sprites', 'stats', 'types', 'url', 'weight']
+```
+
+While aiokemon has no official docs, it is a wrapper library made to mimic
+PokéAPI's endpoints and typing almost exactly. In fact, the Python code found
+in the aiokemon.endpoints.* packages is literally scraped from the PokéAPI
+docs page's HTML and formatted into Python.
+
+For more details about aiokemon, check the [github](https://github.com/bday-boy/aiokemon).
+
+For more details about PokéAPI's documentation, check the official [PokéAPI docs page](https://pokeapi.co/docs/v2).
+"""
+
+
 from aiokemon.endpoints import *
 from aiokemon.core.api import PokeAPIResource
 from aiokemon.core.loaders import *
