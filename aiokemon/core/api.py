@@ -5,10 +5,6 @@ import aiokemon.core.matcher as matcher
 from aiokemon.core.common import Resource
 
 
-class APIMetaData:
-    """Forward declaration for type hinting."""
-
-
 class PokeAPIResource:
     """Class-attribute-based wrapper for an API. Initializes all dictionary
     key-value pairs from a JSON response as class attributes.
@@ -83,7 +79,7 @@ class APIMetaData:
 
     @staticmethod
     def from_data(key: str, data: Union[dict, list]
-                  ) -> Union[APIMetaData, List[APIMetaData]]:
+                  ) -> Union['APIMetaData', List['APIMetaData']]:
         if isinstance(data, dict):
             return APIMetaData(key, data)
         elif isinstance(data, list) \
