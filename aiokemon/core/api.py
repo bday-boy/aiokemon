@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Type, Union
 
 import aiokemon.core.common as cmn
 import aiokemon.core.matcher as matcher
@@ -69,6 +69,14 @@ class PokeAPIResource:
         self.__dict__.update(sanitized_data)
         self._loaded = True
 
+    @classmethod
+    async def get_resource(cls, endpoint: str, resource: Resource,
+                           **kwargs) -> Type['PokeAPIResource']:
+        """Async wrapper function for creating a new APIResource instance."""
+        apiresource = cls(endpoint, resource, **kwargs)
+        await apiresource._load()
+        return apiresource
+
 
 class APIMetaData:
     """More simple class for when data doesn't need to be loaded."""
@@ -110,7 +118,8 @@ class APIMetaData:
         """Creates a new APIResource based on the URL from this class."""
         if getattr(self, 'url', False):
             endpoint, resource = cmn.break_url(self.url)
-            return await get_resource(endpoint, resource, **kwargs)
+            return await PokeAPIResource.get_resource(
+                endpoint, resource, **kwargs)
         elif raise_error:
             raise AttributeError(
                 f'object {repr(self)} has no attribute "url" and thus cannot'
@@ -141,14 +150,6 @@ def sanitize_data(data: dict) -> dict:
         sanitized_data[k] = make_object(k, v)
 
     return sanitized_data
-
-
-async def get_resource(endpoint: str, resource: Resource,
-                       **kwargs) -> PokeAPIResource:
-    """Async wrapper function for creating a new APIResource instance."""
-    apiresource = PokeAPIResource(endpoint, resource, **kwargs)
-    await apiresource._load()
-    return apiresource
 
 
 async def get_subresource(name: str, url: str

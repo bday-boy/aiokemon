@@ -1,14 +1,10 @@
-from aiokemon.core.api import PokeAPIResource, get_resource
-from aiokemon.core.common import get_resource_id
+from aiokemon.endpoints import *
+from aiokemon.core.api import PokeAPIResource
 from aiokemon.core.loaders import *
-from aiokemon.endpoints.pokemon.pokemon import Pokemon
-from aiokemon.endpoints.pokemon.types import Type
 
 __all__ = [
     # Broad API functionality
     'PokeAPIResource',
-    'get_resource',
-    'get_resource_id',
 
     # Resource-specific functions (recommended use)
     'berry',
@@ -61,6 +57,53 @@ __all__ = [
     'language',
 
     # Classes for type hinting
+    'Berry',
+    'BerryFirmness',
+    'BerryFlavor',
+    'ContestType',
+    'ContestEffect',
+    'SuperContestEffect',
+    'EncounterMethod',
+    'EncounterCondition',
+    'EncounterConditionValue',
+    'EvolutionChain',
+    'EvolutionTrigger',
+    'Generation',
+    'Pokedex',
+    'Version',
+    'VersionGroup',
+    'Item',
+    'ItemAttribute',
+    'ItemCategory',
+    'ItemFlingEffect',
+    'ItemPocket',
+    'Location',
+    'LocationArea',
+    'PalParkArea',
+    'Region',
+    'Machine',
+    'Move',
+    'MoveAilment',
+    'MoveBattleStyle',
+    'MoveCategory',
+    'MoveDamageClass',
+    'MoveLearnMethod',
+    'MoveTarget',
+    'Ability',
+    'Characteristic',
+    'EggGroup',
+    'Gender',
+    'GrowthRate',
+    'Nature',
+    'PokeathlonStat',
     'Pokemon',
-    'Type'
+    'LocationAreaEncounter',
+    'PokemonColor',
+    'PokemonForm',
+    'PokemonHabitat',
+    'PokemonShape',
+    'PokemonSpecies',
+    'Stat',
+    'Type',
+    'Language'
 ]
