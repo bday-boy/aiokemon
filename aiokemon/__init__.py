@@ -18,10 +18,22 @@ Here is a basic usage example of getting a Pokemon:
 'order', 'past_types', 'species', 'sprites', 'stats', 'types', 'url', 'weight']
 ```
 
+Above is the recommended usage because specific endpoint functions fully
+support type hinting. However, if you need the ability to pass the endpoint
+as an argument, you can do it like so:
+
+```python
+>>> import aiokemon as ak
+>>> breloom = await ak.PokeAPIResource.get_resource('pokemon', 'breloom')
+>>> breloom
+<pokemon-breloom>
+...
+```
+
 While aiokemon has no official docs, it is a wrapper library made to mimic
 PokéAPI's endpoints and typing almost exactly. In fact, the Python code found
 in the aiokemon.endpoints.* packages is literally scraped from the PokéAPI
-docs page's HTML and formatted into Python.
+docs page's HTML and formatted into Python (see aiokemon/scraper.py).
 
 For more details about aiokemon, check the [github](https://github.com/bday-boy/aiokemon).
 
