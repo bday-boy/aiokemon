@@ -5,6 +5,13 @@ The code is ugly but idc it gets the job done lmao web scraping isn't exactly
 very pretty anyway
 
 Packages this file uses: beautifulsoup4, requests
+
+IMPORTANT NOTE:
+This scraper is not perfect. The Python code generated from scraping will have
+a few minor syntax errors. So whoever is using this file (probably just future
+me, so hi future me :) ) will need to remedy these. The errors are so simple
+you can just try to import aiokemon and it will fail and tell you why, so just
+fix errors that way until they're all gone.
 """
 
 import keyword
