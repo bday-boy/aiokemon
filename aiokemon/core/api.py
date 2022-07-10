@@ -68,12 +68,10 @@ class PokeAPIResource(PokeAPIBase):
             self._resource = await matcher.best_match(
                 self._endpoint, self._resource
             )
-        name, id_ = await cmn.name_and_id(self._endpoint, self._resource)
-        self.name = name
-        self.id = id_
-
         data = await cmn.get_by_resource(self._endpoint, self._resource)
         self._safe_update(data)
+        self.name = data.get('name')
+        self.id = data.get('id')
         self._loaded = True
 
     @classmethod

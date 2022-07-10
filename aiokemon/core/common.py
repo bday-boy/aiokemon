@@ -62,7 +62,7 @@ Resource = Union[str, int]
 backslashes = re.compile(r'/+')
 cache = aiohttp.SQLiteBackend(
     cache_name=fmanager.cache_file('aiohttp-requests.db'),
-    expire_after=60*60*24*7  # a week
+    expire_after=60*60*24*7  # a week (in seconds)
 )
 loaded_endpoints = {}
 
@@ -119,7 +119,7 @@ async def get_by_resource(endpoint: str, resource: Optional[Resource] = None,
         raise ValueError(
             "resource OR querystring can have a value, but not both."
         )
-    await validate_endpoint(endpoint)
+    validate_endpoint(endpoint)
     if isinstance(resource, int):
         await validate_id(endpoint, resource)
     url = join_url(BASE_URL, endpoint, str(resource or ''), query=querystring)
@@ -163,7 +163,7 @@ async def load_endpoint(endpoint: str):
     }
 
 
-async def validate_endpoint(endpoint: str) -> None:
+def validate_endpoint(endpoint: str) -> None:
     """Validates a given endpoint and resource.
 
     ## Raises
@@ -179,29 +179,10 @@ async def validate_id(endpoint: str, id_: int) -> None:
     ## Raises
     `ValueError` if the ID is invalid.
     """
-    await validate_endpoint(endpoint)
+    validate_endpoint(endpoint)
     await load_endpoint(endpoint)
     if id_ not in loaded_endpoints[endpoint]['ids']:
         raise ValueError(f'endpoint has no ID "{id_}"')
-
-
-async def name_and_id(endpoint: str, resource: Resource) -> Tuple[str, int]:
-    """Returns the name and ID of a given resource."""
-    if isinstance(resource, str):
-        res = await get_by_resource(endpoint, resource)
-        name = resource
-        id_ = res.get('id')
-    elif isinstance(resource, int):
-        res = await get_by_resource(endpoint, resource)
-        name = res.get('name')
-        id_ = resource
-    else:
-        raise TypeError(
-            f'resource must be str or int, not {type(resource)}. '
-            f'Value is {repr(resource)}.'
-        )
-
-    return name, id_
 
 
 def get_resource_id(url: str) -> int:

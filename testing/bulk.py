@@ -83,7 +83,7 @@ async def get_json(url: str) -> dict:
 
 async def get_all_resources(endpoint: str) -> dict:
     """Queries an endpoint for all of its resources."""
-    url = join_url(BASE_URL, endpoint, query='limit=100000')
+    url = join_url(BASE_URL, endpoint, query='limit=500')
     return await get_json(url)
 
 
@@ -93,7 +93,7 @@ async def all_pokemon_async():
     start = timer()
     mons = await asyncio.gather(*(ak.pokemon(mon['name']) for mon in pokemon_results))
     print(f'aiohttp version took {timer() - start} seconds.')
-    
+
 
 async def all_pokemon_sync():
     all_pokemon = (await get_all_resources('pokemon')).get('results')
