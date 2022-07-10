@@ -64,7 +64,7 @@ cache = aiohttp.SQLiteBackend(
     cache_name=fmanager.cache_file('aiohttp-requests.db'),
     expire_after=60*60*24*7  # a week
 )
-endpoints = {}
+loaded_endpoints = {}
 
 
 def join_url(*url_parts: str, query: Optional[str] = None) -> str:
@@ -145,20 +145,19 @@ async def get_all_resources(endpoint: str) -> dict:
     return await get_json(url)
 
 
-async def load_endpoint_resources(endpoint: str):
+async def load_endpoint(endpoint: str):
     """If an endpoint doesn't exist in the endpoint_resources dict, it is
     loaded (if it is a valid endpoint).
 
     ## Raises
     `ValueError` if the endpoint is not valid.
     """
-    await validate_endpoint(endpoint)
-    if endpoint in endpoints:
+    if endpoint in loaded_endpoints:
         return
     results = (await get_all_resources(endpoint)).get('results', [])
     resource_names = {result['name'] for result in results}
     resource_ids = {get_resource_id(result['url']) for result in results}
-    endpoints[endpoint] = {
+    loaded_endpoints[endpoint] = {
         'names': resource_names,
         'ids': resource_ids
     }
@@ -181,8 +180,8 @@ async def validate_id(endpoint: str, id_: int) -> None:
     `ValueError` if the ID is invalid.
     """
     await validate_endpoint(endpoint)
-    await load_endpoint_resources(endpoint)
-    if id_ not in endpoints[endpoint]['ids']:
+    await load_endpoint(endpoint)
+    if id_ not in loaded_endpoints[endpoint]['ids']:
         raise ValueError(f'endpoint has no ID "{id_}"')
 
 

@@ -26,17 +26,17 @@ def add_matches(endpoint: str, search: str, matches: list) -> None:
     """Computes string distance between the search and the actual endpoint
     for each resource in the endpoint and adds it to the matches list.
     """
-    for resource in cmn.endpoints[endpoint]['names']:
+    for resource in cmn.loaded_endpoints[endpoint]['names']:
         matches.append((resource, levenshtein_osa(resource, search)))
 
 
 async def best_match(endpoint: str, resource_attempt: str) -> str:
     """Finds the best match for a given resource of a given endpoint."""
     await cmn.validate_endpoint(endpoint)
-    await cmn.load_endpoint_resources(endpoint)
+    await cmn.load_endpoint(endpoint)
 
     # Don't need to bother searching if it's an exact match
-    if resource_attempt in cmn.endpoints[endpoint]['names']:
+    if resource_attempt in cmn.loaded_endpoints[endpoint]['names']:
         return resource_attempt
 
     matches = []
