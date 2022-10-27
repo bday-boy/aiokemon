@@ -3,7 +3,7 @@ from typing import Optional, Union
 from aiohttp.typedefs import StrOrURL
 from aiohttp_client_cache import CachedSession, SQLiteBackend, CacheBackend
 
-import aiokemon.common as cmn
+import aiokemon.core.common as cmn
 import aiokemon.utils.file as fmanager
 
 Resource = Union[str, int]
@@ -13,7 +13,7 @@ class PokeAPISession(CachedSession):
     """Session manager for PokeAPI."""
     loaded_endpoints = {}
 
-    def __init__(self, base_url: Optional[StrOrURL] = None, *,
+    def __init__(self, base_url: Optional[StrOrURL] = cmn.BASE_URL, *,
                  cache: CacheBackend = None, **kwargs):
         if not cache:
             cache = SQLiteBackend(
@@ -50,7 +50,7 @@ class PokeAPISession(CachedSession):
         self.validate_endpoint(endpoint)
         if isinstance(resource, int):
             await self.validate_id(endpoint, resource)
-        url = self.join_url(
+        url = cmn.join_url(
             cmn.BASE_URL, endpoint, str(resource or ''), query=querystring
         )
         json_data = await self.get_json(url)
@@ -84,14 +84,14 @@ class PokeAPISession(CachedSession):
         results = (await self.get_all_resources(endpoint)).get('results', [])
         resource_names = {result['name'] for result in results}
         resource_ids = {
-            self.get_resource_id(result['url']) for result in results
+            cmn.get_resource_id(result['url']) for result in results
         }
         PokeAPISession.loaded_endpoints[endpoint] = {
             'names': resource_names,
             'ids': resource_ids
         }
 
-    def validate_endpoint(endpoint: str) -> None:
+    def validate_endpoint(self, endpoint: str) -> None:
         """Validates a given endpoint and resource.
 
         ## Raises
@@ -110,3 +110,15 @@ class PokeAPISession(CachedSession):
         await self.load_endpoint(endpoint)
         if id_ not in PokeAPISession.loaded_endpoints[endpoint]['ids']:
             raise ValueError(f'endpoint has no ID "{id_}"')
+
+
+async def test():
+    async with PokeAPISession() as session:
+        mons = await session.get_all_resources('pokemon')
+        breloom = await session.get_by_resource('pokemon', 'breloom')
+        mega_punch = await session.get_by_resource('move', 'mega-punch')
+
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(test())
