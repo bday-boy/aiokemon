@@ -1,6 +1,7 @@
 from typing import Optional, Union
 
 from aiohttp.typedefs import StrOrURL
+from aiohttp import ClientSession
 from aiohttp_client_cache import CachedSession, SQLiteBackend, CacheBackend
 
 import aiokemon.core.common as cmn
@@ -13,14 +14,13 @@ class PokeAPISession(CachedSession):
     """Session manager for PokeAPI."""
     loaded_endpoints = {}
 
-    def __init__(self, base_url: Optional[StrOrURL] = cmn.BASE_URL, *,
-                 cache: CacheBackend = None, **kwargs):
+    def __init__(self, *, cache: CacheBackend = None, **kwargs):
         if not cache:
             cache = SQLiteBackend(
                 cache_name=fmanager.cache_file('aiohttp-requests.db'),
                 expire_after=60*60*24*7  # a week (in seconds)
             )
-        super().__init__(base_url, cache=cache, **kwargs)
+        super().__init__(cache=cache, **kwargs)
 
     async def get_json(self, url: str) -> dict:
         """Asynchronously gets a json as a dictionary from a GET request.
@@ -117,6 +117,15 @@ async def test():
         mons = await session.get_all_resources('pokemon')
         breloom = await session.get_by_resource('pokemon', 'breloom')
         mega_punch = await session.get_by_resource('move', 'mega-punch')
+        print(mons)
+
+    async with ClientSession() as session:
+        mon_coros = (
+            session.get(res['url']) for res in mons['results']
+        )
+        all_res = await asyncio.gather(*mon_coros)
+        b = 0
+
 
 
 if __name__ == '__main__':
