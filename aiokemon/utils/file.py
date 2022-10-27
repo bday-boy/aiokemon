@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional, Union
 
-home = Path('~').expanduser()
+home = Path.home()
 
 
 def make_cache() -> Union[str, Path]:
