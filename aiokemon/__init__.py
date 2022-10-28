@@ -35,9 +35,11 @@ PokéAPI's endpoints and typing almost exactly. In fact, the Python code found
 in the aiokemon.endpoints.* packages is literally scraped from the PokéAPI
 docs page's HTML and formatted into Python (see aiokemon/scraper.py).
 
-For more details about aiokemon, check the [github](https://github.com/bday-boy/aiokemon).
+For more details about aiokemon, check the
+[github](https://github.com/bday-boy/aiokemon).
 
-For more details about PokéAPI's documentation, check the official [PokéAPI docs page](https://pokeapi.co/docs/v2).
+For more details about PokéAPI's documentation, check the official
+[PokéAPI docs page](https://pokeapi.co/docs/v2).
 """
 
 
@@ -47,56 +49,6 @@ from aiokemon.core.client import PokeAPISession
 __all__ = [
     # Broad API functionality
     'PokeAPISession',
-
-    # Resource-specific functions (recommended use)
-    'berry',
-    'berry_firmness',
-    'berry_flavor',
-    'contest_type',
-    'contest_effect',
-    'super_contest_effect',
-    'encounter_method',
-    'encounter_condition',
-    'encounter_condition_value',
-    'evolution_chain',
-    'evolution_trigger',
-    'generation',
-    'pokedex',
-    'version',
-    'version_group',
-    'item',
-    'item_attribute',
-    'item_category',
-    'item_fling_effect',
-    'item_pocket',
-    'machine',
-    'move',
-    'move_ailment',
-    'move_battle_style',
-    'move_category',
-    'move_damage_class',
-    'move_learn_method',
-    'move_target',
-    'location',
-    'location_area',
-    'pal_park_area',
-    'region',
-    'ability',
-    'characteristic',
-    'egg_group',
-    'gender',
-    'growth_rate',
-    'nature',
-    'pokeathlon_stat',
-    'pokemon',
-    'pokemon_color',
-    'pokemon_form',
-    'pokemon_habitat',
-    'pokemon_shape',
-    'pokemon_species',
-    'stat',
-    'type_',
-    'language',
 
     # Classes for type hinting
     'Berry',

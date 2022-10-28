@@ -17,464 +17,408 @@ pokemon_species.evolution_chain
 stat.characteristics
 """
 
-from aiokemon.core.api import get_subresource
+from aiokemon.core.api import new_pokeapimetadata
 from aiokemon.core.common import Resource
 from aiokemon.endpoints import *
 
 
-async def berry(resource: Resource, **kwargs) -> Berry:
-    """Quick berry lookup.
+class PokeAPIEndpointLoader:
+    """A class for handling loading all type-hinted classes."""
+
+    def __init__(self, session) -> None:
+        self.session = session
+
+    async def berry(self, resource: Resource) -> Berry:
+        """Quick berry lookup.
 
-    See https://pokeapi.co/docsv2/#berries for attributes and more detailed
-    information.
-    """
-    return await Berry.get_resource("berry", resource, **kwargs)
+        See https://pokeapi.co/docsv2/#berries for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('berry', resource)
+
+    async def berry_firmness(self, resource: Resource) -> BerryFirmness:
+        """Quick berry-firmness lookup.
 
+        See https://pokeapi.co/docsv2/#berry-firmnesses for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('berry-firmness', resource)
+
+    async def berry_flavor(self, resource: Resource) -> BerryFlavor:
+        """Quick berry-flavor lookup.
 
-async def berry_firmness(resource: Resource, **kwargs) -> BerryFirmness:
-    """Quick berry-firmness lookup.
+        See https://pokeapi.co/docsv2/#berry-flavors for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('berry-flavor', resource)
+
+    async def contest_type(self, resource: Resource) -> ContestType:
+        """Quick contest-type lookup.
 
-    See https://pokeapi.co/docsv2/#berry-firmnesses for attributes and more
-    detailed information.
-    """
-    return await BerryFirmness.get_resource(
-        "berry-firmness", resource, **kwargs)
+        See https://pokeapi.co/docsv2/#contest-types for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('contest-type', resource)
+
+    async def contest_effect(self, id_: int) -> ContestEffect:
+        """Quick contest-effect lookup.
 
+        See https://pokeapi.co/docsv2/#contest-effects for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('contest-effect', id_)
+
+    async def super_contest_effect(self, id_: int) -> SuperContestEffect:
+        """Quick super-contest-effect lookup.
 
-async def berry_flavor(resource: Resource, **kwargs) -> BerryFlavor:
-    """Quick berry-flavor lookup.
+        See https://pokeapi.co/docsv2/#super-contest-effects for attributes and
+        more detailed information.
+        """
+        return await self.session.get_resource('super-contest-effect', id_)
+
+    async def encounter_method(self, resource: Resource) -> EncounterMethod:
+        """Quick encounter-method lookup.
 
-    See https://pokeapi.co/docsv2/#berry-flavors for attributes and more
-    detailed information.
-    """
-    return await BerryFlavor.get_resource("berry-flavor", resource, **kwargs)
+        See https://pokeapi.co/docsv2/#encounter-methods for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('encounter-method', resource)
+
+    async def encounter_condition(self, resource: Resource,
+                                  ) -> EncounterCondition:
+        """Quick encounter-condition lookup.
+
+        See https://pokeapi.co/docsv2/#encounter-conditions for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('encounter-condition', resource)
+
+    async def encounter_condition_value(self, resource: Resource,
+                                        ) -> EncounterConditionValue:
+        """Quick encounter-condition-value lookup.
+
+        See https://pokeapi.co/docsv2/#encounter-condition-values for attributes
+        and more detailed information.
+        """
+        return await self.session.get_resource('encounter-condition-value', resource)
 
+    async def evolution_chain(self, id_: int) -> EvolutionChain:
+        """Quick evolution-chain lookup.
+
+        See https://pokeapi.co/docsv2/#evolution-chains for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('evolution-chain', id_)
 
-async def contest_type(resource: Resource, **kwargs) -> ContestType:
-    """Quick contest-type lookup.
+    async def evolution_trigger(self, resource: Resource) -> EvolutionTrigger:
+        """Quick evolution-trigger lookup.
+
+        See https://pokeapi.co/docsv2/#evolution-triggers for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('evolution-trigger', resource)
 
-    See https://pokeapi.co/docsv2/#contest-types for attributes and more
-    detailed information.
-    """
-    return await ContestType.get_resource("contest-type", resource, **kwargs)
+    async def generation(self, resource: Resource) -> Generation:
+        """Quick generation lookup.
+
+        See https://pokeapi.co/docsv2/#generations for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('generation', resource)
 
+    async def pokedex(self, resource: Resource) -> Pokedex:
+        """Quick pokedex lookup.
+
+        See https://pokeapi.co/docsv2/#pokedexes for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('pokedex', resource)
 
-async def contest_effect(id_: int, **kwargs) -> ContestEffect:
-    """Quick contest-effect lookup.
+    async def version(self, resource: Resource) -> Version:
+        """Quick version lookup.
+
+        See https://pokeapi.co/docsv2/#versions for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('version', resource)
 
-    See https://pokeapi.co/docsv2/#contest-effects for attributes and more
-    detailed information.
-    """
-    return await ContestEffect.get_resource("contest-effect", id_, **kwargs)
+    async def version_group(self, resource: Resource) -> VersionGroup:
+        """Quick version-group lookup.
+
+        See https://pokeapi.co/docsv2/#version-groups for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('version-group', resource)
 
+    async def item(self, resource: Resource) -> Item:
+        """Quick item lookup.
+
+        See https://pokeapi.co/docsv2/#items for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('item', resource)
 
-async def super_contest_effect(id_: int, **kwargs) -> SuperContestEffect:
-    """Quick super-contest-effect lookup.
+    async def item_attribute(self, resource: Resource) -> ItemAttribute:
+        """Quick item-attribute lookup.
+
+        See https://pokeapi.co/docsv2/#item-attributes for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('item-attribute', resource)
 
-    See https://pokeapi.co/docsv2/#super-contest-effects for attributes and
-    more detailed information.
-    """
-    return await SuperContestEffect.get_resource(
-        "super-contest-effect", id_, **kwargs)
+    async def item_category(self, resource: Resource) -> ItemCategory:
+        """Quick item-category lookup.
+
+        See https://pokeapi.co/docsv2/#item-categories for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('item-category', resource)
 
+    async def item_fling_effect(self, resource: Resource) -> ItemFlingEffect:
+        """Quick item-fling-effect lookup.
+
+        See https://pokeapi.co/docsv2/#item-fling-effects for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('item-fling-effect', resource)
 
-async def encounter_method(resource: Resource, **kwargs) -> EncounterMethod:
-    """Quick encounter-method lookup.
+    async def item_pocket(self, resource: Resource) -> ItemPocket:
+        """Quick item-pocket lookup.
+
+        See https://pokeapi.co/docsv2/#item-pockets for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('item-pocket', resource)
 
-    See https://pokeapi.co/docsv2/#encounter-methods for attributes and more
-    detailed information.
-    """
-    return await EncounterMethod.get_resource(
-        "encounter-method", resource, **kwargs)
+    async def machine(self, id_: int) -> Machine:
+        """Quick machine lookup.
+
+        See https://pokeapi.co/docsv2/#machines for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('machine', id_)
 
+    async def move(self, resource: Resource) -> Move:
+        """Quick move lookup.
+
+        See https://pokeapi.co/docsv2/#moves for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('move', resource)
 
-async def encounter_condition(resource: Resource, **kwargs
-                              ) -> EncounterCondition:
-    """Quick encounter-condition lookup.
+    async def move_ailment(self, resource: Resource) -> MoveAilment:
+        """Quick move-ailment lookup.
+
+        See https://pokeapi.co/docsv2/#move-ailments for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('move-ailment', resource)
 
-    See https://pokeapi.co/docsv2/#encounter-conditions for attributes and more
-    detailed information.
-    """
-    return await EncounterCondition.get_resource(
-        "encounter-condition", resource, **kwargs)
+    async def move_battle_style(self, resource: Resource) -> MoveBattleStyle:
+        """Quick move-battle-style lookup.
+
+        See https://pokeapi.co/docsv2/#move-battle-styles for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('move-battle-style', resource)
 
+    async def move_category(self, resource: Resource) -> MoveCategory:
+        """Quick move-category lookup.
+
+        See https://pokeapi.co/docsv2/#move-categories for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('move-category', resource)
 
-async def encounter_condition_value(resource: Resource, **kwargs
-                                    ) -> EncounterConditionValue:
-    """Quick encounter-condition-value lookup.
+    async def move_damage_class(self, resource: Resource) -> MoveDamageClass:
+        """Quick move-damage-class lookup.
+
+        See https://pokeapi.co/docsv2/#move-damage-classes for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('move-damage-class', resource)
 
-    See https://pokeapi.co/docsv2/#encounter-condition-values for attributes
-    and more detailed information.
-    """
-    return await EncounterConditionValue.get_resource(
-        "encounter-condition-value", resource, **kwargs)
+    async def move_learn_method(self, resource: Resource) -> MoveLearnMethod:
+        """Quick move-learn-method lookup.
+
+        See https://pokeapi.co/docsv2/#move-learn-methods for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('move-learn-method', resource)
 
-
-async def evolution_chain(id_: int, **kwargs) -> EvolutionChain:
-    """Quick evolution-chain lookup.
-
-    See https://pokeapi.co/docsv2/#evolution-chains for attributes and more
-    detailed information.
-    """
-    return await EvolutionChain.get_resource("evolution-chain", id_, **kwargs)
-
-
-async def evolution_trigger(resource: Resource, **kwargs) -> EvolutionTrigger:
-    """Quick evolution-trigger lookup.
-
-    See https://pokeapi.co/docsv2/#evolution-triggers for attributes and more
-    detailed information.
-    """
-    return await EvolutionTrigger.get_resource(
-        "evolution-trigger", resource, **kwargs)
-
-
-async def generation(resource: Resource, **kwargs) -> Generation:
-    """Quick generation lookup.
-
-    See https://pokeapi.co/docsv2/#generations for attributes and more detailed
-    information.
-    """
-    return await Generation.get_resource("generation", resource, **kwargs)
-
-
-async def pokedex(resource: Resource, **kwargs) -> Pokedex:
-    """Quick pokedex lookup.
-
-    See https://pokeapi.co/docsv2/#pokedexes for attributes and more detailed
-    information.
-    """
-    return await Pokedex.get_resource("pokedex", resource, **kwargs)
-
-
-async def version(resource: Resource, **kwargs) -> Version:
-    """Quick version lookup.
-
-    See https://pokeapi.co/docsv2/#versions for attributes and more detailed
-    information.
-    """
-    return await Version.get_resource("version", resource, **kwargs)
-
-
-async def version_group(resource: Resource, **kwargs) -> VersionGroup:
-    """Quick version-group lookup.
-
-    See https://pokeapi.co/docsv2/#version-groups for attributes and more
-    detailed information.
-    """
-    return await VersionGroup.get_resource(
-        "version-group", resource, **kwargs)
-
-
-async def item(resource: Resource, **kwargs) -> Item:
-    """Quick item lookup.
-
-    See https://pokeapi.co/docsv2/#items for attributes and more detailed
-    information.
-    """
-    return await Item.get_resource("item", resource, **kwargs)
-
-
-async def item_attribute(resource: Resource, **kwargs) -> ItemAttribute:
-    """Quick item-attribute lookup.
-
-    See https://pokeapi.co/docsv2/#item-attributes for attributes and more
-    detailed information.
-    """
-    return await ItemAttribute.get_resource(
-        "item-attribute", resource, **kwargs)
-
-
-async def item_category(resource: Resource, **kwargs) -> ItemCategory:
-    """Quick item-category lookup.
-
-    See https://pokeapi.co/docsv2/#item-categories for attributes and more
-    detailed information.
-    """
-    return await ItemCategory.get_resource("item-category", resource, **kwargs)
-
-
-async def item_fling_effect(resource: Resource, **kwargs) -> ItemFlingEffect:
-    """Quick item-fling-effect lookup.
-
-    See https://pokeapi.co/docsv2/#item-fling-effects for attributes and more
-    detailed information.
-    """
-    return await ItemFlingEffect.get_resource(
-        "item-fling-effect", resource, **kwargs)
-
-
-async def item_pocket(resource: Resource, **kwargs) -> ItemPocket:
-    """Quick item-pocket lookup.
-
-    See https://pokeapi.co/docsv2/#item-pockets for attributes and more
-    detailed information.
-    """
-    return await ItemPocket.get_resource("item-pocket", resource, **kwargs)
-
-
-async def machine(id_: int, **kwargs) -> Machine:
-    """Quick machine lookup.
-
-    See https://pokeapi.co/docsv2/#machines for attributes and more detailed
-    information.
-    """
-    return await Machine.get_resource("machine", id_, **kwargs)
-
-
-async def move(resource: Resource, **kwargs) -> Move:
-    """Quick move lookup.
-
-    See https://pokeapi.co/docsv2/#moves for attributes and more detailed
-    information.
-    """
-    return await Move.get_resource("move", resource, **kwargs)
-
-
-async def move_ailment(resource: Resource, **kwargs) -> MoveAilment:
-    """Quick move-ailment lookup.
-
-    See https://pokeapi.co/docsv2/#move-ailments for attributes and more
-    detailed information.
-    """
-    return await MoveAilment.get_resource("move-ailment", resource, **kwargs)
-
-
-async def move_battle_style(resource: Resource, **kwargs) -> MoveBattleStyle:
-    """Quick move-battle-style lookup.
-
-    See https://pokeapi.co/docsv2/#move-battle-styles for attributes and more
-    detailed information.
-    """
-    return await MoveBattleStyle.get_resource(
-        "move-battle-style", resource, **kwargs)
-
-
-async def move_category(resource: Resource, **kwargs) -> MoveCategory:
-    """Quick move-category lookup.
-
-    See https://pokeapi.co/docsv2/#move-categories for attributes and more
-    detailed information.
-    """
-    return await MoveCategory.get_resource(
-        "move-category", resource, **kwargs)
-
-
-async def move_damage_class(resource: Resource, **kwargs) -> MoveDamageClass:
-    """Quick move-damage-class lookup.
-
-    See https://pokeapi.co/docsv2/#move-damage-classes for attributes and more
-    detailed information.
-    """
-    return await MoveDamageClass.get_resource(
-        "move-damage-class", resource, **kwargs)
-
-
-async def move_learn_method(resource: Resource, **kwargs) -> MoveLearnMethod:
-    """Quick move-learn-method lookup.
-
-    See https://pokeapi.co/docsv2/#move-learn-methods for attributes and more
-    detailed information.
-    """
-    return await MoveLearnMethod.get_resource(
-        "move-learn-method", resource, **kwargs)
-
-
-async def move_target(resource: Resource, **kwargs) -> MoveTarget:
-    """Quick move-target lookup.
-
-    See https://pokeapi.co/docsv2/#move-targets for attributes and more
-    detailed information.
-    """
-    return await MoveTarget.get_resource("move-target", resource, **kwargs)
-
-
-async def location(id_: int, **kwargs) -> Location:
-    """Quick location lookup.
-
-    See https://pokeapi.co/docsv2/#locations for attributes and more detailed
-    information.
-    """
-    return await Location.get_resource("location", id_, **kwargs)
-
-
-async def location_area(id_: int, **kwargs) -> LocationArea:
-    """Quick location-area lookup.
-
-    See https://pokeapi.co/docsv2/#location-areas for attributes and more
-    detailed information.
-    """
-    return await LocationArea.get_resource("location-area", id_, **kwargs)
-
-
-async def pal_park_area(resource: Resource, **kwargs) -> PalParkArea:
-    """Quick pal-park-area lookup.
-
-    See https://pokeapi.co/docsv2/#pal-park-areas for attributes and more
-    detailed information.
-    """
-    return await PalParkArea.get_resource("pal-park-area", resource, **kwargs)
-
-
-async def region(resource: Resource, **kwargs) -> Region:
-    """Quick region lookup.
-
-    See https://pokeapi.co/docsv2/#regions for attributes and more detailed
-    information.
-    """
-    return await Region.get_resource("region", resource, **kwargs)
-
-
-async def ability(resource: Resource, **kwargs) -> Ability:
-    """Quick ability lookup.
-
-    See https://pokeapi.co/docsv2/#abilities for attributes and more detailed
-    information.
-    """
-    return await Ability.get_resource("ability", resource, **kwargs)
-
-
-async def characteristic(id_: int, **kwargs) -> Characteristic:
-    """Quick characteristic lookup.
-
-    See https://pokeapi.co/docsv2/#characteristics for attributes and more
-    detailed information.
-    """
-    return await Characteristic.get_resource("characteristic", id_, **kwargs)
-
-
-async def egg_group(resource: Resource, **kwargs) -> EggGroup:
-    """Quick egg-group lookup.
-
-    See https://pokeapi.co/docsv2/#egg-groups for attributes and more detailed
-    information.
-    """
-    return await EggGroup.get_resource("egg-group", resource, **kwargs)
-
-
-async def gender(resource: Resource, **kwargs) -> Gender:
-    """Quick gender lookup.
-
-    See https://pokeapi.co/docsv2/#genders for attributes and more detailed
-    information.
-    """
-    return await Gender.get_resource("gender", resource, **kwargs)
-
-
-async def growth_rate(resource: Resource, **kwargs) -> GrowthRate:
-    """Quick growth-rate lookup.
-
-    See https://pokeapi.co/docsv2/#growth-rates for attributes and more
-    detailed information.
-    """
-    return await GrowthRate.get_resource("growth-rate", resource, **kwargs)
-
-
-async def nature(resource: Resource, **kwargs) -> Nature:
-    """Quick nature lookup.
-
-    See https://pokeapi.co/docsv2/#natures for attributes and more detailed
-    information.
-    """
-    return await Nature.get_resource("nature", resource, **kwargs)
-
-
-async def pokeathlon_stat(resource: Resource, **kwargs) -> PokeathlonStat:
-    """Quick pokeathlon-stat lookup.
-
-    See https://pokeapi.co/docsv2/#pokeathlon-stats for attributes and more
-    detailed information.
-    """
-    return await PokeathlonStat.get_resource(
-        "pokeathlon-stat", resource, **kwargs)
-
-
-async def pokemon(resource: Resource, **kwargs) -> Pokemon:
-    """Quick pokemon lookup.
-
-    See https://pokeapi.co/docsv2/#pokemon for attributes and more detailed
-    information.
-    """
-    pkmn = await Pokemon.get_resource("pokemon", resource, **kwargs)
-    pkmn.location_area_encounters = await get_subresource(
-        'location_area_encounters', pkmn.location_area_encounters
-    )
-    return pkmn
-
-
-async def pokemon_color(resource: Resource, **kwargs) -> PokemonColor:
-    """Quick pokemon-color lookup.
-
-    See https://pokeapi.co/docsv2/#pokemon-colors for attributes and more
-    detailed information.
-    """
-    return await PokemonColor.get_resource("pokemon-color", resource, **kwargs)
-
-
-async def pokemon_form(resource: Resource, **kwargs) -> PokemonForm:
-    """Quick pokemon-form lookup.
-
-    See https://pokeapi.co/docsv2/#pokemon-forms for attributes and more
-    detailed information.
-    """
-    return await PokemonForm.get_resource("pokemon-form", resource, **kwargs)
-
-
-async def pokemon_habitat(resource: Resource, **kwargs) -> PokemonHabitat:
-    """Quick pokemon-habitat lookup.
-
-    See https://pokeapi.co/docsv2/#pokemon-habitats for attributes and more
-    detailed information.
-    """
-    return await PokemonHabitat.get_resource(
-        "pokemon-habitat", resource, **kwargs)
-
-
-async def pokemon_shape(resource: Resource, **kwargs) -> PokemonShape:
-    """Quick pokemon-shape lookup.
-
-    See https://pokeapi.co/docsv2/#pokemon-shapes for attributes and more
-    detailed information.
-    """
-    return await PokemonShape.get_resource("pokemon-shape", resource, **kwargs)
-
-
-async def pokemon_species(resource: Resource, **kwargs) -> PokemonSpecies:
-    """Quick pokemon-species lookup.
-
-    See https://pokeapi.co/docsv2/#pokemon-species for attributes and more
-    detailed information.
-    """
-    pkmn = await PokemonSpecies.get_resource(
-        "pokemon-species", resource, **kwargs)
-    pkmn.evolution_chain = await get_subresource(
-        'evolution_chain', pkmn.evolution_chain.url
-    )
-    return pkmn
-
-
-async def stat(resource: Resource, **kwargs) -> Stat:
-    """Quick stat lookup.
-
-    See https://pokeapi.co/docsv2/#stats for attributes and more detailed
-    information.
-    """
-    return await Stat.get_resource("stat", resource, **kwargs)
-
-
-async def type_(resource: Resource, **kwargs) -> Type:
-    """Quick type lookup.
-
-    See https://pokeapi.co/docsv2/#types for attributes and more detailed
-    information.
-    """
-    return await Type.get_resource("type", resource, **kwargs)
-
-
-async def language(resource: Resource, **kwargs) -> Language:
-    """Quick language lookup.
-
-    See https://pokeapi.co/docsv2/#languages for attributes and more detailed
-    information.
-    """
-    return await Language.get_resource("language", resource, **kwargs)
+    async def move_target(self, resource: Resource) -> MoveTarget:
+        """Quick move-target lookup.
+
+        See https://pokeapi.co/docsv2/#move-targets for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('move-target', resource)
+
+    async def location(self, id_: int) -> Location:
+        """Quick location lookup.
+
+        See https://pokeapi.co/docsv2/#locations for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('location', id_)
+
+    async def location_area(self, id_: int) -> LocationArea:
+        """Quick location-area lookup.
+
+        See https://pokeapi.co/docsv2/#location-areas for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('location-area', id_)
+
+    async def pal_park_area(self, resource: Resource) -> PalParkArea:
+        """Quick pal-park-area lookup.
+
+        See https://pokeapi.co/docsv2/#pal-park-areas for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('pal-park-area', resource)
+
+    async def region(self, resource: Resource) -> Region:
+        """Quick region lookup.
+
+        See https://pokeapi.co/docsv2/#regions for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('region', resource)
+
+    async def ability(self, resource: Resource) -> Ability:
+        """Quick ability lookup.
+
+        See https://pokeapi.co/docsv2/#abilities for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('ability', resource)
+
+    async def characteristic(self, id_: int) -> Characteristic:
+        """Quick characteristic lookup.
+
+        See https://pokeapi.co/docsv2/#characteristics for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('characteristic', id_)
+
+    async def egg_group(self, resource: Resource) -> EggGroup:
+        """Quick egg-group lookup.
+
+        See https://pokeapi.co/docsv2/#egg-groups for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('egg-group', resource)
+
+    async def gender(self, resource: Resource) -> Gender:
+        """Quick gender lookup.
+
+        See https://pokeapi.co/docsv2/#genders for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('gender', resource)
+
+    async def growth_rate(self, resource: Resource) -> GrowthRate:
+        """Quick growth-rate lookup.
+
+        See https://pokeapi.co/docsv2/#growth-rates for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('growth-rate', resource)
+
+    async def nature(self, resource: Resource) -> Nature:
+        """Quick nature lookup.
+
+        See https://pokeapi.co/docsv2/#natures for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('nature', resource)
+
+    async def pokeathlon_stat(self, resource: Resource) -> PokeathlonStat:
+        """Quick pokeathlon-stat lookup.
+
+        See https://pokeapi.co/docsv2/#pokeathlon-stats for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('pokeathlon-stat', resource)
+
+    async def pokemon(self, resource: Resource) -> Pokemon:
+        """Quick pokemon lookup.
+
+        See https://pokeapi.co/docsv2/#pokemon for attributes and more detailed
+        information.
+        """
+        pkmn = await self.session.get_resource('pokemon', resource)
+        pokeapi_data = await self.session.get_json(pkmn.location_area_encounters)
+        pkmn.location_area_encounters = new_pokeapimetadata(
+            'location_area_encounters', pokeapi_data
+        )
+        return pkmn
+
+    async def pokemon_color(self, resource: Resource) -> PokemonColor:
+        """Quick pokemon-color lookup.
+
+        See https://pokeapi.co/docsv2/#pokemon-colors for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('pokemon-color', resource)
+
+    async def pokemon_form(self, resource: Resource) -> PokemonForm:
+        """Quick pokemon-form lookup.
+
+        See https://pokeapi.co/docsv2/#pokemon-forms for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('pokemon-form', resource)
+
+    async def pokemon_habitat(self, resource: Resource) -> PokemonHabitat:
+        """Quick pokemon-habitat lookup.
+
+        See https://pokeapi.co/docsv2/#pokemon-habitats for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('pokemon-habitat', resource)
+
+    async def pokemon_shape(self, resource: Resource) -> PokemonShape:
+        """Quick pokemon-shape lookup.
+
+        See https://pokeapi.co/docsv2/#pokemon-shapes for attributes and more
+        detailed information.
+        """
+        return await self.session.get_resource('pokemon-shape', resource)
+
+    async def pokemon_species(self, resource: Resource) -> PokemonSpecies:
+        """Quick pokemon-species lookup.
+
+        See https://pokeapi.co/docsv2/#pokemon-species for attributes and more
+        detailed information.
+        """
+        pkmn = await self.session.get_resource('pokemon-species', resource)
+        pokeapi_data = await self.session.get_json(pkmn.evolution_chain)
+        pkmn.evolution_chain = new_pokeapimetadata(
+            'evolution_chain', pokeapi_data)
+        return pkmn
+
+    async def stat(self, resource: Resource) -> Stat:
+        """Quick stat lookup.
+
+        See https://pokeapi.co/docsv2/#stats for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('stat', resource)
+
+    async def type_(self, resource: Resource) -> Type:
+        """Quick type lookup.
+
+        See https://pokeapi.co/docsv2/#types for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('type', resource)
+
+    async def language(self, resource: Resource) -> Language:
+        """Quick language lookup.
+
+        See https://pokeapi.co/docsv2/#languages for attributes and more detailed
+        information.
+        """
+        return await self.session.get_resource('language', resource)

@@ -1,8 +1,6 @@
-from typing import Any, List, Optional, Type, Union
+from typing import Any, List, Optional, Union
 
 import aiokemon.core.common as cmn
-import aiokemon.core.matcher as matcher
-from aiokemon.core.common import Resource
 
 
 class PokeAPIBase:
