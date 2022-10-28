@@ -70,7 +70,7 @@ class PokeAPISession(CachedSession):
             cmn.BASE_URL, endpoint, str(resource or ''), query=querystring
         )
         pokeapi_data = await self.get_json(url)
-        return PokeAPIResource(pokeapi_data)
+        return PokeAPIResource(endpoint, pokeapi_data)
 
     async def get_all_resources(self, endpoint: str) -> dict:
         """Queries an endpoint for all of its resources."""
@@ -91,14 +91,13 @@ if __name__ == '__main__':
             breloom = await session.endpoints.pokemon('breloom')
             mega_punch = await session.endpoints.move('mega-punch')
             mon_coros = tuple(session.endpoints.pokemon(res['name'])
-                              for res in mons['results']
-                              if res['name'].startswith('a'))
+                              for res in mons['results'])[:250]
             all_res = await asyncio.gather(*mon_coros)
             b = 0
-    
+
     async def test_matcher():
         async with PokeAPISession() as session:
             breloom = await session.endpoints.pokemon('brelom')
             b = 0
 
-    asyncio.run(test_matcher())
+    asyncio.run(test_session())

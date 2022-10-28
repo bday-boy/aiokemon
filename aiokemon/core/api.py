@@ -41,11 +41,12 @@ class PokeAPIResource(PokeAPIBase):
     ```
     """
 
-    def __init__(self, data: dict, custom: Optional[dict] = None) -> None:
+    def __init__(self, endpoint: str, data: dict, custom: Optional[dict] = None) -> None:
         """Creates an un-loaded APIResource class. Attributes and such can
         only be guaranteed once the async function _load is awaited.
         """
         self._safe_update(data)
+        self._endpoint = endpoint
         self.name = data.get('name')
         self.id = data.get('id')
         if custom is not None:
@@ -55,7 +56,7 @@ class PokeAPIResource(PokeAPIBase):
         return self.name
 
     def __repr__(self) -> str:
-        return f'<{self._endpoint}-{self._resource}>'
+        return f'<{self._endpoint} {self.name}>'
 
 
 class PokeAPIMetaData(PokeAPIBase):
@@ -79,8 +80,10 @@ class PokeAPIMetaData(PokeAPIBase):
         `AttributeError` if a PokeAPIMetaData cannot be loaded as a resource.
         """
         if self.is_resource:
-            json_data = await session.get_json()
-            return PokeAPIResource(json_data)
+            url = getattr(self, 'url')
+            json_data = await session.get_json(url)
+            endpoint, _ = cmn.break_url(url)
+            return PokeAPIResource(endpoint, json_data)
         elif raise_error:
             raise AttributeError(
                 f'object {repr(self)} has no attribute "url" and thus cannot '
