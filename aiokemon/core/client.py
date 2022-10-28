@@ -64,7 +64,7 @@ class PokeAPISession(CachedSession):
             raise ValueError(
                 "resource OR querystring can have a value, but not both."
             )
-        if resource and isinstance(resource, str) and self.matcher is not None:
+        if self.matcher is not None and resource and isinstance(resource, str):
             resource = await self.matcher.best_match(endpoint, resource, self)
         url = cmn.join_url(
             cmn.BASE_URL, endpoint, str(resource or ''), query=querystring

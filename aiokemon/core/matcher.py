@@ -55,23 +55,25 @@ class ResourceMatcher:
         for resource in self.loaded_endpoints[endpoint]:
             matches.append((resource, levenshtein_osa(resource, search)))
 
-    async def best_match(self, endpoint: str, resource_attempt: str, session
-                         ) -> str:
+    async def best_match(self, endpoint: str, resource: str, session) -> str:
         """Finds the best match for a given resource of a given endpoint."""
         self._validate_endpoint(endpoint)
         if endpoint not in self.loaded_endpoints:
             await self._load_endpoint(endpoint, session)
 
         # Don't need to bother searching if it's an exact match
-        if resource_attempt in self.loaded_endpoints[endpoint]:
-            return resource_attempt
+        if resource in self.loaded_endpoints[endpoint]:
+            return resource
 
         matches = []
-        search_1, search_2 = self._get_searches(endpoint, resource_attempt)
+        search, search_reversed = self._get_searches(endpoint, resource)
+        self._add_matches(endpoint, search, matches)
 
-        self._add_matches(endpoint, search_1, matches)
-        if search_1 != search_2:
-            self._add_matches(endpoint, search_2, matches)
+        # Many alt forms in PokeAPI are listed as [alt]-[name] rather than
+        # [name]-[alt], i.e. shield-aegislash. So if our search is not the same
+        # forwards and backwards, we'll also test the reversed search
+        if search != search_reversed:
+            self._add_matches(endpoint, search_reversed, matches)
 
         matches.sort(key=lambda t: t[1])
         return matches[0][0]
