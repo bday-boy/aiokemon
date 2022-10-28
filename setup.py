@@ -9,7 +9,7 @@ def readme() -> str:
 setup(
     name='aiokemon',
     packages=find_packages(),
-    version='1.0.0',
+    version='0.1.0',
     description='An asynchronous Python wrapper for making PokéAPI requests',
     long_description=readme(),
     author='Birthday Boy',
@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'aiohttp',
         'aiohttp-client-cache',
-        'aiosqlite'
+        'aiosqlite',
     ],
-    license='MIT License'
+    license='BSD-3-Clause license'
 )
