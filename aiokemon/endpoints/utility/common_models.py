@@ -1,5 +1,5 @@
 from typing import List
-from aiokemon.core.api import APIMetaData
+from aiokemon.core.api import PokeAPIMetaData
 
 
 class APIResource:
@@ -7,7 +7,7 @@ class APIResource:
     url: str
 
 
-class NamedAPIResource(APIMetaData):
+class NamedAPIResource(PokeAPIMetaData):
     """The simplest subresource possible, containing just a name and URL."""
     name: str
     url: str

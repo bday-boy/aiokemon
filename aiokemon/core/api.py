@@ -15,14 +15,14 @@ class PokeAPIBase:
         """
         for k, v in data.items():
             k = cmn.sanitize_attribute(k)
-            self.__dict__[k] = make_object(k, v)
+            self.__dict__[k] = new_pokeapimetadata(k, v)
 
     @property
-    def attrs(self) -> List[str]:
+    def pokeapi_attrs(self) -> List[str]:
         """Returns all PokéAPI attributes of the class."""
         return [
             k for k in dir(self) if not k.startswith('_')
-            and k not in {'attrs', 'as_resource'}
+            and k not in {'pokeapi_attrs', 'as_resource'}
         ]
 
 
@@ -43,16 +43,15 @@ class PokeAPIResource(PokeAPIBase):
     ```
     """
 
-    def __init__(self, endpoint: str, resource: Resource,
-                 custom: Optional[dict] = None) -> None:
+    def __init__(self, data: dict, custom: Optional[dict] = None) -> None:
         """Creates an un-loaded APIResource class. Attributes and such can
         only be guaranteed once the async function _load is awaited.
         """
+        self._safe_update(data)
+        self.name = data.get('name')
+        self.id = data.get('id')
         if custom is not None:
             self._safe_update(custom)
-        self._endpoint = endpoint
-        self._resource = resource
-        self._loaded = False
 
     def __str__(self) -> str:
         return self.name
@@ -60,48 +59,37 @@ class PokeAPIResource(PokeAPIBase):
     def __repr__(self) -> str:
         return f'<{self._endpoint}-{self._resource}>'
 
-    async def _load(self) -> None:
-        """Asynchronously loads the information for the given resource
-        in-place and returns a reference to itself.
-        """
-        if isinstance(self._resource, str):
-            self._resource = await matcher.best_match(
-                self._endpoint, self._resource
-            )
-        data = await cmn.get_by_resource(self._endpoint, self._resource)
-        self._safe_update(data)
-        self.name = data.get('name')
-        self.id = data.get('id')
-        self._loaded = True
 
-    @classmethod
-    async def get_resource(cls, endpoint: str, resource: Resource,
-                           **kwargs) -> Type['PokeAPIResource']:
-        """Async wrapper function for creating a new APIResource instance."""
-        apiresource = cls(endpoint, resource, **kwargs)
-        await apiresource._load()
-        return apiresource
-
-
-class APIMetaData(PokeAPIBase):
+class PokeAPIMetaData(PokeAPIBase):
     """Simple class used for sub-dicts and -lists in a response JSON."""
-
-    @staticmethod
-    def _from_data(key: str, data: Union[dict, list]
-                   ) -> Union['APIMetaData', List['APIMetaData']]:
-        if isinstance(data, dict):
-            return APIMetaData(key, data)
-        elif isinstance(data, list) \
-                and all(isinstance(entry, dict) for entry in data):
-            return [APIMetaData(key, entry) for entry in data]
-        else:
-            raise TypeError(
-                'APIMetaData can only be created from a dict or list of dicts.'
-            )
 
     def __init__(self, key: str, data: dict) -> None:
         self._key = key
         self._safe_update(data)
+
+    @property
+    def is_resource(self) -> bool:
+        return bool(getattr(self, 'url', None))
+
+    async def as_resource(self, session, raise_error: bool = False,
+                          ) -> Union[PokeAPIResource, None]:
+        """Creates a new APIResource based on the URL from this class. If
+        raise_error is false, AttributeError will not be raised even if the
+        PokeAPIMetaData cannot be loaded as a resource.
+
+        ## Raises
+        `AttributeError` if a PokeAPIMetaData cannot be loaded as a resource.
+        """
+        if self.is_resource:
+            json_data = await session.get_json()
+            return PokeAPIResource(json_data)
+        elif raise_error:
+            raise AttributeError(
+                f'object {repr(self)} has no attribute "url" and thus cannot '
+                'be loaded as a resource'
+            )
+        else:
+            return None
 
     def __str__(self) -> str:
         return self._key
@@ -109,34 +97,14 @@ class APIMetaData(PokeAPIBase):
     def __repr__(self) -> str:
         return f'<APIMetaData object for key "{self._key}">'
 
-    async def as_resource(self, raise_error: bool = False,
-                          **kwargs) -> PokeAPIResource:
-        """Creates a new APIResource based on the URL from this class."""
-        if getattr(self, 'url', False):
-            endpoint, resource = cmn.break_url(self.url)
-            return await PokeAPIResource.get_resource(
-                endpoint, resource, **kwargs)
-        elif raise_error:
-            raise AttributeError(
-                f'object {repr(self)} has no attribute "url" and thus cannot'
-                'be loaded as a resource'
-            )
-        else:
-            return None
 
-
-def make_object(key: str, obj: Any) -> Any:
+def new_pokeapimetadata(key: str, obj: Any) -> Any:
     """Turns a dict or list of dicts into an APIMetaData object or a list of
     APIMetaData objects and does nothing otherwise.
     """
-    if isinstance(obj, (dict, list)):
-        return APIMetaData._from_data(key, obj)
-    return obj
-
-
-async def get_subresource(name: str, url: str
-                          ) -> Union[APIMetaData, List[APIMetaData]]:
-    """Async wrapper function for creating a new APIMetaData instance."""
-    data = await cmn.get_by_url(url)
-    apimetadata = APIMetaData._from_data(name, data)
-    return apimetadata
+    if isinstance(obj, dict):
+        return PokeAPIMetaData(key, obj)
+    elif isinstance(obj, list) and all(isinstance(item, dict) for item in obj):
+        return [PokeAPIMetaData(key, item) for item in obj]
+    else:
+        return obj

@@ -1,5 +1,5 @@
 """
-This file is used to scrape the PokeAPI docs page for type-hinting purposes.
+This file is used to scrape the PokéAPI docs page for type-hinting purposes.
 Python modules are then generated and put into the endpoints directory.
 The code is ugly but idc it gets the job done lmao web scraping isn't exactly
 very pretty anyway
@@ -133,7 +133,7 @@ def gen_tables(resource_header: BeautifulSoup
             if node.name == 'table':
                 yield node
             else:
-                # PokeAPI always seems to have an h4 followed by a table, so
+                # PokéAPI always seems to have an h4 followed by a table, so
                 # if we didn't get a table, then there's some sort of exception
                 print('Some weird formatting occurred.')
                 print(node.prettify())

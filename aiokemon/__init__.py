@@ -42,12 +42,11 @@ For more details about PokéAPI's documentation, check the official [PokéAPI do
 
 
 from aiokemon.endpoints import *
-from aiokemon.core.api import PokeAPIResource
-from aiokemon.core.loaders import *
+from aiokemon.core.client import PokeAPISession
 
 __all__ = [
     # Broad API functionality
-    'PokeAPIResource',
+    'PokeAPISession',
 
     # Resource-specific functions (recommended use)
     'berry',
