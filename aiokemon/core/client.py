@@ -7,6 +7,7 @@ import aiokemon.utils.file as fmanager
 from aiokemon.core.api import PokeAPIResource
 from aiokemon.core.common import Resource
 from aiokemon.core.loaders import PokeAPIEndpointLoader
+from aiokemon.core.matcher import ResourceMatcher
 from aiokemon.endpoints import *
 
 Resource = Union[str, int]
@@ -18,7 +19,8 @@ class PokeAPISession(CachedSession):
     """
     loaded_endpoints = {}
 
-    def __init__(self, *, cache: CacheBackend = None, **kwargs):
+    def __init__(self, *, cache: CacheBackend = None, match: bool = True,
+                 **kwargs):
         """If no cache is given, an SQLite one is created by default at
         $HOME/.cache/aiohttp-requests.db.
         """
@@ -29,6 +31,7 @@ class PokeAPISession(CachedSession):
             )
         super().__init__(cache=cache, **kwargs)
         self.endpoints = PokeAPIEndpointLoader(self)
+        self.matcher = ResourceMatcher() if match else None
 
     async def get_json(self, url: str) -> dict:
         """Asynchronously gets a json as a dictionary from a GET request. This
@@ -61,9 +64,8 @@ class PokeAPISession(CachedSession):
             raise ValueError(
                 "resource OR querystring can have a value, but not both."
             )
-        self.validate_endpoint(endpoint)
-        if isinstance(resource, int):
-            await self.validate_id(endpoint, resource)
+        if resource and isinstance(resource, str) and self.matcher is not None:
+            resource = await self.matcher.best_match(endpoint, resource, self)
         url = cmn.join_url(
             cmn.BASE_URL, endpoint, str(resource or ''), query=querystring
         )
@@ -75,63 +77,28 @@ class PokeAPISession(CachedSession):
         url = cmn.join_url(cmn.BASE_URL, endpoint, query='limit=100000')
         return await self.get_json(url)
 
-    async def load_endpoint(self, endpoint: str):
-        """If an endpoint doesn't exist in the endpoint_resources dict, it is
-        loaded (if it is a valid endpoint).
-
-        ## Raises
-        `ValueError` if the endpoint is not valid.
-        """
-        if endpoint in PokeAPISession.loaded_endpoints:
-            return
-        results = (await self.get_all_resources(endpoint)).get('results', [])
-        resource_names = {result['name'] for result in results}
-        resource_ids = {
-            cmn.get_resource_id(result['url']) for result in results
-        }
-        PokeAPISession.loaded_endpoints[endpoint] = {
-            'names': resource_names,
-            'ids': resource_ids
-        }
-
-    def validate_endpoint(self, endpoint: str) -> None:
-        """Validates a given endpoint and resource.
-
-        ## Raises
-        `ValueError` if the endpoint is invalid.
-        """
-        if endpoint not in cmn.VALID_ENDPOINTS:
-            raise ValueError(f'endpoint "{endpoint}" does not exist.')
-
-    async def validate_id(self, endpoint: str, id_: int) -> None:
-        """Validates a given resource's ID.
-
-        ## Raises
-        `ValueError` if the ID is invalid.
-        """
-        self.validate_endpoint(endpoint)
-        await self.load_endpoint(endpoint)
-        if id_ not in PokeAPISession.loaded_endpoints[endpoint]['ids']:
-            raise ValueError(f'endpoint has no ID "{id_}"')
-    
     async def __aenter__(self) -> 'PokeAPISession':
         """Just exists for type hinting."""
         return await super().__aenter__()
 
 
-async def test():
-    import asyncio
-    async with PokeAPISession() as session:
-        mons = await session.get_all_resources('pokemon')
-        breloom = await session.endpoints.pokemon('breloom')
-        mega_punch = await session.endpoints.move('mega-punch')
-        mon_coros = tuple(session.endpoints.pokemon(res['name'])
-                          for res in mons['results']
-                          if res['name'].startswith('a'))
-        all_res = await asyncio.gather(*mon_coros)
-        b = 0
-
-
 if __name__ == '__main__':
     import asyncio
-    asyncio.run(test())
+
+    async def test_session():
+        async with PokeAPISession() as session:
+            mons = await session.get_all_resources('pokemon')
+            breloom = await session.endpoints.pokemon('breloom')
+            mega_punch = await session.endpoints.move('mega-punch')
+            mon_coros = tuple(session.endpoints.pokemon(res['name'])
+                              for res in mons['results']
+                              if res['name'].startswith('a'))
+            all_res = await asyncio.gather(*mon_coros)
+            b = 0
+    
+    async def test_matcher():
+        async with PokeAPISession() as session:
+            breloom = await session.endpoints.pokemon('brelom')
+            b = 0
+
+    asyncio.run(test_matcher())

@@ -8,43 +8,70 @@ and_pokemon = re.compile(r'\s?(pok[eé]mon|and)\s?', re.IGNORECASE)
 non_alphanumerical = re.compile(r'[^a-z0-9]', re.IGNORECASE)
 
 
-def get_searches(endpoint: str, resource_attempt: str) -> Tuple[str, str]:
-    """Formats searches to fit the syntax of the endpoints.
-
-    TODO: Add custom formatter for certain endpoints, like one for game
-    to remove 'and'.
+class ResourceMatcher:
+    """Uses fuzzy string matching to find the closest-matching resource
+    when the given one doesn't exist.
     """
-    if endpoint in {'version', 'version-group'}:
-        resource_attempt = and_pokemon.sub(' ', resource_attempt).strip()
-    split_resource = non_alphanumerical.split(resource_attempt)
-    return (
-        '-'.join(split_resource), '-'.join(reversed(split_resource))
-    )
 
+    def __init__(self) -> None:
+        self.cache = {}
+        self.loaded_endpoints = {}
 
-def add_matches(endpoint: str, search: str, matches: list) -> None:
-    """Computes string distance between the search and the actual endpoint
-    for each resource in the endpoint and adds it to the matches list.
-    """
-    for resource in cmn.loaded_endpoints[endpoint]['names']:
-        matches.append((resource, levenshtein_osa(resource, search)))
+    async def _load_endpoint(self, endpoint: str, session):
+        """If an endpoint doesn't exist in the endpoint_resources dict, it is
+        loaded (if it is a valid endpoint).
 
+        ## Raises
+        `ValueError` if the endpoint is not valid.
+        """
+        results = await session.get_all_resources(endpoint)
+        resource_names = {res['name'] for res in results.get('results', [])}
+        self.loaded_endpoints[endpoint] = resource_names
 
-async def best_match(endpoint: str, resource_attempt: str) -> str:
-    """Finds the best match for a given resource of a given endpoint."""
-    await cmn.validate_endpoint(endpoint)
-    await cmn.load_endpoint(endpoint)
+    def _validate_endpoint(self, endpoint: str) -> None:
+        """Validates a given endpoint and resource.
 
-    # Don't need to bother searching if it's an exact match
-    if resource_attempt in cmn.loaded_endpoints[endpoint]['names']:
-        return resource_attempt
+        ## Raises
+        `ValueError` if the endpoint is invalid.
+        """
+        if endpoint not in cmn.VALID_ENDPOINTS:
+            raise ValueError(f'endpoint "{endpoint}" does not exist.')
 
-    matches = []
-    search_1, search_2 = get_searches(endpoint, resource_attempt)
+    def _get_searches(self, endpoint: str, resource_attempt: str) -> Tuple[str, str]:
+        """Formats searches to fit the syntax of the endpoints.
 
-    add_matches(endpoint, search_1, matches)
-    if search_1 != search_2:
-        add_matches(endpoint, search_2, matches)
+        TODO: Add custom formatter for certain endpoints, like one for game
+        to remove 'and'.
+        """
+        if endpoint in {'version', 'version-group'}:
+            resource_attempt = and_pokemon.sub(' ', resource_attempt).strip()
+        split_resource = non_alphanumerical.split(resource_attempt)
+        return '-'.join(split_resource), '-'.join(reversed(split_resource))
 
-    matches.sort(key=lambda t: t[1])
-    return matches[0][0]
+    def _add_matches(self, endpoint: str, search: str, matches: list) -> None:
+        """Computes string distance between the search and the actual endpoint
+        for each resource in the endpoint and adds it to the matches list.
+        """
+        for resource in self.loaded_endpoints[endpoint]:
+            matches.append((resource, levenshtein_osa(resource, search)))
+
+    async def best_match(self, endpoint: str, resource_attempt: str, session
+                         ) -> str:
+        """Finds the best match for a given resource of a given endpoint."""
+        self._validate_endpoint(endpoint)
+        if endpoint not in self.loaded_endpoints:
+            await self._load_endpoint(endpoint, session)
+
+        # Don't need to bother searching if it's an exact match
+        if resource_attempt in self.loaded_endpoints[endpoint]:
+            return resource_attempt
+
+        matches = []
+        search_1, search_2 = self._get_searches(endpoint, resource_attempt)
+
+        self._add_matches(endpoint, search_1, matches)
+        if search_1 != search_2:
+            self._add_matches(endpoint, search_2, matches)
+
+        matches.sort(key=lambda t: t[1])
+        return matches[0][0]
