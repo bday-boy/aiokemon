@@ -4,7 +4,7 @@ from typing import Optional, Union
 home = Path.home()
 
 
-def make_cache() -> Union[str, Path]:
+def make_cache() -> Path:
     """Creates a .cache directory at the user's home if one doesn't
     already exist.
 

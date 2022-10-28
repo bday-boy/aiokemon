@@ -1,6 +1,29 @@
+import keyword
 from typing import Any, List, Optional, Union
 
 import aiokemon.core.common as cmn
+
+
+def sanitize_attribute(attr: str) -> str:
+    """Given a string, this function attempts to create a valid python
+    identifier by replacing all hyphens with underscores. If the given string
+    is a reserved Python keyword or a built-in function, a trailing underscore
+    is added (i.e. `True` -> `True_`).
+
+    ## Raises
+    `ValueError` when `attr` is not a valid identifier after replacing all
+    hyphens with underscores.
+    """
+    attr = attr.replace('-', '_')
+    if not attr.isidentifier():
+        raise ValueError(f'attr "{attr}" is not a valid identifier.')
+    if keyword.iskeyword(attr):
+        print(
+            f'Warning: string "{attr}" is a keyword. Adding a trailing '
+            'underscore to prevent syntax errors.'
+        )
+        return attr + '_'
+    return attr
 
 
 class PokeAPIBase:
@@ -12,7 +35,7 @@ class PokeAPIBase:
         sub-lists into APIMetaData lists.
         """
         for k, v in data.items():
-            k = cmn.sanitize_attribute(k)
+            k = sanitize_attribute(k)
             self.__dict__[k] = new_pokeapimetadata(k, v)
 
     @property
