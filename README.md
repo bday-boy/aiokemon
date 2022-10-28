@@ -2,7 +2,8 @@
 
 [![License](https://img.shields.io/github/license/bday-boy/aiokemon?style=flat-square)](./LICENSE)
 
-__aiokemon__ is an asynchronous Python wrapper for making PokéAPI requests.
+__aiokemon__ is an asynchronous Python wrapper for making
+[PokéAPI](https://pokeapi.co/) requests.
 
 It took a *lot* of inspiration from
 [Pokebase](https://github.com/PokeAPI/pokebase), so huge thanks to everyone
