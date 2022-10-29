@@ -91,7 +91,7 @@ if __name__ == '__main__':
             breloom = await session.endpoints.pokemon('breloom')
             mega_punch = await session.endpoints.move('mega-punch')
             mon_coros = tuple(session.endpoints.pokemon(res['name'])
-                              for res in mons['results'])[:250]
+                              for res in mons['results'])[:20]
             all_res = await asyncio.gather(*mon_coros)
             b = 0
 
