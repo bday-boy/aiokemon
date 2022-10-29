@@ -66,15 +66,13 @@ class PokeAPISession(CachedSession):
             )
         if self.matcher is not None and resource and isinstance(resource, str):
             resource = await self.matcher.best_match(endpoint, resource, self)
-        url = cmn.join_url(
-            cmn.BASE_URL, endpoint, str(resource or ''), query=querystring
-        )
+        url = cmn.join_url(endpoint, str(resource or ''), query=querystring)
         pokeapi_data = await self.get_json(url)
         return PokeAPIResource(endpoint, pokeapi_data)
 
     async def get_all_resources(self, endpoint: str) -> dict:
         """Queries an endpoint for all of its resources."""
-        url = cmn.join_url(cmn.BASE_URL, endpoint, query='limit=100000')
+        url = cmn.join_url(endpoint, query='limit=100000')
         return await self.get_json(url)
 
     async def __aenter__(self) -> 'PokeAPISession':

@@ -2,7 +2,7 @@ import re
 from typing import Optional, Tuple, Union
 from urllib.parse import urlparse
 
-BASE_URL = 'https://pokeapi.co/api/v2'
+BASE_URL = 'https://pokeapi.co/api/v2/'
 VALID_ENDPOINTS = {
     'ability',
     'berry',
@@ -61,7 +61,7 @@ def join_url(*url_parts: str, query: Optional[str] = None) -> str:
     """Returns a URL by stripping the components of trailing forward slashes
     and then joining them with forward slashes. Ignores falsy parts.
     """
-    url = '/'.join(part.strip('/') for part in url_parts if part)
+    url = BASE_URL + '/'.join(part.strip('/') for part in url_parts if part)
     if query:
         url += '?' + query.lstrip('?')
     return url

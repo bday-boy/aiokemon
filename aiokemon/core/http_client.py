@@ -3,17 +3,8 @@ from typing import Dict, List, Optional, Type, Union
 
 from aiohttp import ClientSession
 
-from cache import JSONCache
-
-class cmn:
-    BASE_URL = ''
-
-    @staticmethod
-    def join_url(*url_parts, qs: Optional[str] = None):
-        url = '/'.join(part.strip('/') for part in url_parts if part)
-        if qs:
-            url += '?' + qs.lstrip('?')
-        return url
+import aiokemon.core.common as cmn
+from aiokemon.core.cache import JSONCache, cache_get
 
 
 class SimpleHTTPCacheClient:
@@ -26,24 +17,21 @@ class SimpleHTTPCacheClient:
         """Ends the session and dumps the cache."""
         if self._session:
             await self._session.close()
+        self._cache.safe_dump()
 
-    async def get(self, endpoint: str, resource: str, querystring: str
-                  ) -> Union[Dict, List]:
+    @cache_get
+    async def get(self, endpoint: str, resource: Optional[str] = None,
+                  querystring: Optional[str] = None) -> Union[Dict, List]:
         """Queries the server for a response and returns the JSON."""
-        url = cmn.join_url(cmn.BASE_URL, endpoint, resource, qs=querystring)
+        url = cmn.join_url(endpoint, resource, query=querystring)
         async with self._session.get(url) as response:
-            await response.raise_for_status()
-
-            if self._cache.has(endpoint, resource, url):
-                return self._cache(endpoint, resource, url)
-
+            response.raise_for_status()
             json_data = await response.json()
-            if isinstance(json_data, dict):
-                json_data['url'] = url
-            self._cache.put(endpoint, resource, url, json_data)
-            return json_data
+        if isinstance(json_data, dict):
+            json_data['url'] = url
+        return json_data
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> 'SimpleHTTPCacheClient':
         return self
 
     async def __aexit__(
@@ -59,19 +47,15 @@ if __name__ == '__main__':
     import asyncio
 
     async def test():
-        base_url = 'https://woot.com/'
-        test_dict = {
-            'jdsiofjsdafd': [
-                'fdsifojdsofjds',
-                'fdjsiofjdsofjdso',
-                15,
-                'asdiodjifojds'
-            ],
-            'fdsjifojdsofjd': 'yeahhheahfduhishif'
-        }
         async with SimpleHTTPCacheClient() as session:
-            for i, s in enumerate(('test', 'yeehaw', 'yeahbaby')):
-                session._cache.put(s, f'{s}{i}', f'{base_url}/{s}/{s}{i}', test_dict)
-            raise Exception
+            mons = await session.get('pokemon', querystring='limit=10000')
+            mon_coros = tuple(session.get('pokemon', res['name'])
+                              for res in mons['results'])
+            await asyncio.gather(*mon_coros)
+
+            moves = await session.get('move', querystring='limit=100000')
+            move_coros = tuple(session.get('move', res['name'])
+                               for res in moves['results'])
+            await asyncio.gather(*move_coros)
 
     asyncio.run(test())

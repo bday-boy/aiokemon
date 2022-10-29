@@ -1,8 +1,11 @@
 import hashlib
 import json
+import zlib
 from collections import UserDict
 from typing import Dict, List, Optional, Union
 from pathlib import Path
+
+import aiokemon.core.common as cmn
 
 JSONSerializable = Union[Dict, List]
 
@@ -53,15 +56,26 @@ class JSONLoader(UserDict):
         super().__init__(*args, **kwargs)
 
     def get_json_path(self, endpoint) -> Path:
-        return self.cache_dir / f'{endpoint}.json'
+        return self.cache_dir / f'{endpoint}.json.zip'
+
+    def dump_json(self, endpoint: str, data: JSONSerializable) -> None:
+        json_path = self.get_json_path(endpoint)
+        with open(json_path, 'wb') as zipfile:
+            compressed_json = zlib.compress(bytes(json.dumps(data), 'utf-8'))
+            zipfile.write(compressed_json)
+    
+    def load_json(self, endpoint: str) -> dict:
+        json_path = self.get_json_path(endpoint)
+        with open(json_path, 'rb') as json_file:
+            compressed_json = json_file.read()
+            bin_json = zlib.decompress(compressed_json)
+            return json.loads(bin_json.decode('utf-8'))
 
     def __getitem__(self, endpoint: str) -> JSONSerializable:
         if endpoint not in self:
             json_path = self.get_json_path(endpoint)
             if json_path.exists():
-                with open(json_path) as json_file:
-                    cached_data = json.load(json_file)
-                    self[endpoint] = cached_data
+                self[endpoint] = self.load_json(endpoint)
             else:
                 self[endpoint] = {}
         return super().__getitem__(endpoint)
@@ -116,9 +130,23 @@ class JSONCache(BaseCache):
 
     def _dump_cache(self) -> None:
         for endpoint in self._cache_dict:
-            json_path = self._cache_dict.get_json_path(endpoint)
-            with open(json_path, 'w') as json_file:
-                json.dump(self._cache_dict[endpoint], json_file, indent=2)
+            self._cache_dict.dump_json(endpoint, self._cache_dict[endpoint])
+
+
+def cache_get(get_coro):
+    async def cache_wrapper(session, endpoint: str,
+                            resource: Optional[str] = None,
+                            querystring: Optional[str] = None):
+        url = cmn.join_url(endpoint, resource, query=querystring)
+        if session._cache.has(endpoint, resource, url):
+            return session._cache.get(endpoint, resource, url)
+        json_data = await get_coro(
+            session, endpoint, resource, querystring
+        )
+        session._cache.put(endpoint, resource, url, json_data)
+        return json_data
+
+    return cache_wrapper
 
 
 if __name__ == '__main__':
