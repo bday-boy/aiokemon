@@ -4,8 +4,6 @@ from collections import UserDict
 from typing import Dict, List, Optional, Union
 from pathlib import Path
 
-from aiokemon.utils.file import make_cache
-
 JSONSerializable = Union[Dict, List]
 
 def make_key(resource: str, url: str) -> str:
