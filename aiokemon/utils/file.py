@@ -13,7 +13,7 @@ def make_cache() -> Union[str, Path]:
     """
     cache_dir = home / '.cache'
     if not cache_dir.is_dir():
-        cache_dir.mkdir()
+        cache_dir.mkdir(parents=True)
         if not cache_dir.is_dir():
             raise OSError(
                 "couldn't create the .cache directory. Please create one "
