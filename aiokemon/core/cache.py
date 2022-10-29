@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import zlib
@@ -8,6 +9,7 @@ from pathlib import Path
 import aiokemon.core.common as cmn
 
 JSONSerializable = Union[Dict, List]
+
 
 def make_key(resource: str, url: str) -> str:
     """Since URLs contain an abundance of characters unsafe for use in
@@ -37,6 +39,9 @@ class BaseCache:
     def has(self, *args, **kwargs) -> bool:
         raise NotImplementedError('Cache needs a `has` method to work.')
 
+    def safe_dump(self, *args, **kwargs) -> bool:
+        raise NotImplementedError('Cache needs a `safe_dump` method to work.')
+
 
 class JSONLoader(UserDict):
     """Custom dict class created to act like a defaultdict that loads cached
@@ -63,11 +68,13 @@ class JSONLoader(UserDict):
         with open(json_path, 'wb') as zipfile:
             compressed_json = zlib.compress(bytes(json.dumps(data), 'utf-8'))
             zipfile.write(compressed_json)
-    
+
     def load_json(self, endpoint: str) -> dict:
         json_path = self.get_json_path(endpoint)
         with open(json_path, 'rb') as json_file:
             compressed_json = json_file.read()
+            if not compressed_json:
+                return {}
             bin_json = zlib.decompress(compressed_json)
             return json.loads(bin_json.decode('utf-8'))
 
@@ -94,11 +101,22 @@ class JSONCache(BaseCache):
 
     def get(self, endpoint: str, resource: str, url: str
             ) -> Union[Dict, List, None]:
-        return self._cache_dict[endpoint].get(make_key(resource, url))
+        cached_data = self._cache_dict[endpoint].get(make_key(resource, url))
+        if cached_data:
+            # Encode UTF-8 str into bytes str then decode base64 bytes
+            serializable_data = base64.b64decode(cached_data.encode('utf-8'))
+            # Decompress base64 bytes and decode to UTF-8 string
+            bin_dict = zlib.decompress(serializable_data).decode('utf-8')
+            cached_data = json.loads(bin_dict)
+        return cached_data
 
     def put(self, endpoint: str, resource: str, url: str,
             data: JSONSerializable) -> None:
-        self._cache_dict[endpoint][make_key(resource, url)] = data
+        # Convert JSON str to bytes then compress into bytes
+        compressed_data = zlib.compress(bytes(json.dumps(data), 'utf-8'))
+        # Encode bytes into base64 bytes, then decode to UTF-8 str
+        serializable_data = base64.b64encode(compressed_data).decode('utf-8')
+        self._cache_dict[endpoint][make_key(resource, url)] = serializable_data
 
     def has(self, endpoint: str, resource: str, url: str) -> bool:
         return make_key(resource, url) in self._cache_dict[endpoint]
@@ -106,15 +124,6 @@ class JSONCache(BaseCache):
     def safe_dump(self) -> None:
         try:
             self._dump_cache()
-        except (FileNotFoundError, TypeError, ValueError):
-            import pickle
-            print(
-                'Something went wrong when dumping the cache jsons. '
-                'Dumping the entire JSONLoader object as a pickle file '
-                'in the current directory instead.'
-            )
-            with open('emergency_cache_dump.pkl', 'w') as f:
-                pickle.dump(self._cache_dict, f)
         except NameError as e:
             if "name 'open' is not defined" in e.args:
                 raise RuntimeError(
