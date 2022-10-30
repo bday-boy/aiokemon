@@ -44,11 +44,11 @@ For more details about PokéAPI's documentation, check the official
 
 
 from aiokemon.endpoints import *
-from aiokemon.core.client import PokeAPISession
+from aiokemon.core.client import PokeAPIClient
 
 __all__ = [
     # Broad API functionality
-    'PokeAPISession',
+    'PokeAPIClient',
 
     # Classes for type hinting
     'Berry',

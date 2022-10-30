@@ -10,7 +10,7 @@ from aiokemon.core.base_client import PokeAPIClientBase
 Resource = Union[str, int]
 
 
-class PokeAPISession(PokeAPIClientBase):
+class PokeAPIClient(PokeAPIClientBase):
     """Session manager for PokéAPI. Pokeapi.co requires the use of a cache, so
     aiohttp_client_cache is used.
     """
@@ -431,7 +431,7 @@ class PokeAPISession(PokeAPIClientBase):
         """
         return await self.get_resource('language', resource)
 
-    async def __aenter__(self) -> 'PokeAPISession':
+    async def __aenter__(self) -> 'PokeAPIClient':
         """Just exists for type hinting."""
         return await super().__aenter__()
 
@@ -440,18 +440,24 @@ if __name__ == '__main__':
     import asyncio
 
     async def test_session():
-        async with PokeAPISession() as session:
+        async with PokeAPIClient() as session:
             mons = await session.get_all_resources('pokemon')
-            breloom = await session.endpoints.pokemon('breloom')
-            mega_punch = await session.endpoints.move('mega-punch')
-            mon_coros = tuple(session.endpoints.pokemon(res['name'])
-                              for res in mons['results'])[:20]
-            all_res = await asyncio.gather(*mon_coros)
-            b = 0
+            mon_coros = tuple(session.pokemon(res['name'])
+                              for res in mons['results'])
+            all_mons = await asyncio.gather(*mon_coros)
+
+            moves = await session.get_all_resources('move')
+            move_coros = tuple(session.move(res['name'])
+                               for res in moves['results'])
+            all_moves = await asyncio.gather(*move_coros)
 
     async def test_matcher():
-        async with PokeAPISession() as session:
-            breloom = await session.endpoints.pokemon('brelom')
+        async with PokeAPIClient() as session:
+            await session.pokemon('brelom')
+            await session.pokemon('drilfoon')
+            await session.pokemon('vileplume')
+            await session.pokemon('bouldore')
+            await session.pokemon('garchom')
             b = 0
 
-    asyncio.run(test_session())
+    asyncio.run(test_matcher())
