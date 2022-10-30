@@ -4,16 +4,20 @@ from typing import Dict, List, Optional, Type, Union
 from aiohttp import ClientSession
 
 import aiokemon.core.common as cmn
-from aiokemon.core.cache import JSONCache, cache_get
+from aiokemon.core.cache import cache_get, EmptyCache, JSONCache
 from aiokemon.core.matcher import ResourceMatcher
 
 
 class PokeAPIClientBase:
-    def __init__(self, session: Optional[ClientSession] = None,
-                 match: bool = True, cache=None) -> None:
+    def __init__(self, session: Optional[ClientSession] = None, *,
+                 match: bool = True, cache=None, should_cache: bool = True
+                 ) -> None:
         self._session = session or ClientSession()
-        self._cache = cache or JSONCache()
         self._matcher = ResourceMatcher() if match else None
+        if should_cache:
+            self._cache = cache or JSONCache()
+        else:
+            self._cache = EmptyCache()
 
     async def close(self) -> None:
         """Ends the session and dumps the cache."""
@@ -22,8 +26,8 @@ class PokeAPIClientBase:
         self._cache.safe_dump()
 
     @cache_get
-    async def get(self, endpoint: str, resource: Optional[str] = None,
-                  querystring: Optional[str] = None) -> Union[Dict, List]:
+    async def _get(self, endpoint: str, resource: Optional[str] = None,
+                   querystring: Optional[str] = None) -> Union[Dict, List]:
         """Joins the base URL, the endpoint, the resource, and the querystring
         together, then asynchronously sends a GET request for it.
 
@@ -51,6 +55,11 @@ class PokeAPIClientBase:
             json_data = await response.json()
         return json_data
 
+    async def get_available_resources(self, endpoint: str) -> dict:
+        """Queries an endpoint for all its existing resources."""
+        url = cmn.join_url(endpoint, query='limit=100000')
+        return await self._get_json(url)
+
     async def __aenter__(self) -> 'PokeAPIClientBase':
         return self
 
@@ -67,15 +76,26 @@ if __name__ == '__main__':
     import asyncio
 
     async def test():
-        async with PokeAPIClientBase() as session:
-            mons = await session.get('pokemon', querystring='limit=10000')
-            mon_coros = tuple(session.get('pokemon', res['name'])
+        async with PokeAPIClientBase(should_cache=False) as session:
+            mons = await session._get('pokemon', querystring='limit=10000')
+            mon_coros = tuple(session._get('pokemon', res['name'])
                               for res in mons['results'])
             await asyncio.gather(*mon_coros)
 
-            moves = await session.get('move', querystring='limit=100000')
-            move_coros = tuple(session.get('move', res['name'])
+            moves = await session._get('move', querystring='limit=100000')
+            move_coros = tuple(session._get('move', res['name'])
                                for res in moves['results'])
             await asyncio.gather(*move_coros)
 
-    asyncio.run(test())
+            a = 0
+
+    async def test_matcher():
+        async with PokeAPIClientBase() as session:
+            await session._get('pokemon', 'brelom')
+            await session._get('pokemon', 'drilfoon')
+            await session._get('pokemon', 'vileplume')
+            await session._get('pokemon', 'bouldore')
+            await session._get('pokemon', 'garchom')
+            b = 0
+
+    asyncio.run(test_matcher())

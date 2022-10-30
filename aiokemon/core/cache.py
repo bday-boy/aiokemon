@@ -43,6 +43,19 @@ class BaseCache:
         raise NotImplementedError('Cache needs a `safe_dump` method to work.')
 
 
+class EmptyCache(BaseCache):
+    """Cache class used when no caching is desired."""
+
+    def put(self, *args, **kwargs) -> None:
+        pass
+
+    def has(self, *args, **kwargs) -> bool:
+        return False
+
+    def safe_dump(self, *args, **kwargs) -> bool:
+        pass
+
+
 class JSONLoader(UserDict):
     """Custom dict class created to act like a defaultdict that loads cached
     JSON files when an endpoint is accessed for the first time.
@@ -122,6 +135,7 @@ class JSONCache(BaseCache):
         return make_key(resource, url) in self._cache_dict[endpoint]
 
     def safe_dump(self) -> None:
+        print('Dumping cache...')
         try:
             self._dump_cache()
         except NameError as e:
@@ -135,7 +149,7 @@ class JSONCache(BaseCache):
                     'you can manually dump the cache at any point by calling'
                     'the safe_dump function.'
                 )
-        print('Dumping cache...')
+        print('Cache dumped.')
 
     def _dump_cache(self) -> None:
         for endpoint in self._cache_dict:

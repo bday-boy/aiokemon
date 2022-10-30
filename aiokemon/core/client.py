@@ -27,13 +27,8 @@ class PokeAPIClient(PokeAPIClientBase):
         - The endpoint or resource is invalid
         - Both the resource and querystring have a value (only one should)
         """
-        pokeapi_data = await self.get(endpoint, resource, querystring)
+        pokeapi_data = await self._get(endpoint, resource, querystring)
         return PokeAPIResource(endpoint, pokeapi_data)
-
-    async def get_all_resources(self, endpoint: str) -> dict:
-        """Queries an endpoint for all of its resources."""
-        url = cmn.join_url(endpoint, query='limit=100000')
-        return await self._get_json(url)
 
     async def berry(self, resource: Resource) -> Berry:
         """Quick berry lookup.
@@ -441,15 +436,17 @@ if __name__ == '__main__':
 
     async def test_session():
         async with PokeAPIClient() as session:
-            mons = await session.get_all_resources('pokemon')
+            mons = await session.get_available_resources('pokemon')
             mon_coros = tuple(session.pokemon(res['name'])
                               for res in mons['results'])
             all_mons = await asyncio.gather(*mon_coros)
 
-            moves = await session.get_all_resources('move')
+            moves = await session.get_available_resources('move')
             move_coros = tuple(session.move(res['name'])
                                for res in moves['results'])
             all_moves = await asyncio.gather(*move_coros)
+
+            a = 0
 
     async def test_matcher():
         async with PokeAPIClient() as session:
@@ -460,4 +457,4 @@ if __name__ == '__main__':
             await session.pokemon('garchom')
             b = 0
 
-    asyncio.run(test_matcher())
+    asyncio.run(test_session())

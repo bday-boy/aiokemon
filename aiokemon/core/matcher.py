@@ -24,7 +24,7 @@ class ResourceMatcher:
         ## Raises
         `ValueError` if the endpoint is not valid.
         """
-        results = await session.get_all_resources(endpoint)
+        results = await session.get_available_resources(endpoint)
         resource_names = {res['name'] for res in results.get('results', [])}
         self.loaded_endpoints[endpoint] = resource_names
 
