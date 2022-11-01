@@ -144,11 +144,11 @@ def cache_get(get_coro):
                             url: Optional[str] = None
                             ) -> Union[Dict, List, None]:
         if url is None:
-            url = cmn.join_url(endpoint, resource, query=querystring)
+            url = cmn.join_url(endpoint, resource, querystring=querystring)
         if session._cache.has(endpoint, url):
             return session._cache.get(endpoint, url)
         json_data = await get_coro(
-            session, endpoint, resource, querystring
+            session, endpoint, resource, querystring, url
         )
         session._cache.put(endpoint, url, json_data)
         return json_data

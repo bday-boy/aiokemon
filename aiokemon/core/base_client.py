@@ -34,7 +34,7 @@ class PokeAPIClientBase:
                                  ) -> str:
         """Queries the PokeAPI server and returns the response text."""
         if url is None:
-            url = cmn.join_url(endpoint, resource, query=querystring)
+            url = cmn.join_url(endpoint, resource, querystring=querystring)
         async with self._session.get(url) as response:
             response.raise_for_status()
             response_text = await response.text()
@@ -57,8 +57,8 @@ class PokeAPIClientBase:
             )
         if self._matcher is not None and isinstance(resource, str):
             resource = await self._matcher.best_match(endpoint, resource, self)
-        url = cmn.join_url(endpoint, resource, query=querystring)
-        response_text = await self._get_response_text(endpoint, resource)
+        url = cmn.join_url(endpoint, resource, querystring=querystring)
+        response_text = await self._get_response_text(endpoint, url=url)
         json_data = json.loads(response_text)
         if isinstance(json_data, dict):
             json_data['url'] = url
