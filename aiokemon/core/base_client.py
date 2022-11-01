@@ -18,7 +18,7 @@ except ImportError:
 async def gather_with_progress(awaitables: Iterable[Awaitable],
                                desc: Optional[str] = None) -> List[Any]:
     """Wraps asyncio.as_completed in a tqdm constructor so progress gets
-    printed to stdout.
+    printed to stdout. Requires tqdm.
     """
     if tqdm is None:
         raise NameError(
