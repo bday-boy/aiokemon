@@ -353,7 +353,7 @@ class PokeAPIClient(PokeAPIClientBase):
         """
         pkmn = await self.get_resource('pokemon', resource)
         pokeapi_data = await self._get_response_text(
-            pkmn.location_area_encounters
+            'pokemon', url=pkmn.location_area_encounters
         )
         pkmn.location_area_encounters = new_pokeapimetadata(
             'location_area_encounters', json.loads(pokeapi_data)
@@ -399,7 +399,9 @@ class PokeAPIClient(PokeAPIClientBase):
         detailed information.
         """
         pkmn = await self.get_resource('pokemon-species', resource)
-        pokeapi_data = await self._get_response_text(pkmn.evolution_chain)
+        pokeapi_data = await self._get_response_text(
+            'evolution-chain', url=pkmn.evolution_chain.url
+        )
         pkmn.evolution_chain = new_pokeapimetadata(
             'evolution_chain', json.loads(pokeapi_data)
         )
