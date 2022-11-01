@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Type, Union
 from aiohttp import ClientSession
 
 import aiokemon.core.common as cmn
-from aiokemon.core.cache import cache_get, EmptyCache, JSONCache
+from aiokemon.core.cache import cache_get, EmptyCache, PickleFileCache
 from aiokemon.core.matcher import ResourceMatcher
 
 
@@ -15,7 +15,7 @@ class PokeAPIClientBase:
         self._session = session or ClientSession()
         self._matcher = ResourceMatcher() if match else None
         if should_cache:
-            self._cache = cache or JSONCache()
+            self._cache = cache or PickleFileCache()
         else:
             self._cache = EmptyCache()
 
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     import asyncio
 
     async def test():
-        async with PokeAPIClientBase(should_cache=False) as session:
+        async with PokeAPIClientBase() as session:
             mons = await session._get('pokemon', querystring='limit=10000')
             mon_coros = tuple(session._get('pokemon', res['name'])
                               for res in mons['results'])
@@ -98,4 +98,4 @@ if __name__ == '__main__':
             await session._get('pokemon', 'garchom')
             b = 0
 
-    asyncio.run(test_matcher())
+    asyncio.run(test())

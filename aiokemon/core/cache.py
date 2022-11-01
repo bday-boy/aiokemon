@@ -1,6 +1,6 @@
-import base64
 import hashlib
 import json
+import pickle
 import zlib
 from collections import UserDict
 from typing import Dict, List, Optional, Union
@@ -56,15 +56,15 @@ class EmptyCache(BaseCache):
         pass
 
 
-class JSONLoader(UserDict):
+class PickleLoader(UserDict):
     """Custom dict class created to act like a defaultdict that loads cached
-    JSON files when an endpoint is accessed for the first time.
+    pickle files when an endpoint is accessed for the first time.
     """
 
     def __init__(self, cache_dir: Optional[Path] = None, *args,
                  **kwargs) -> None:
         if cache_dir is None:
-            self.cache_dir = Path.home() / '.cache' / 'pokeapi_json_cache'
+            self.cache_dir = Path.home() / '.cache' / 'aiokemon'
         elif isinstance(cache_dir, str):
             self.cache_dir = Path(cache_dir)
         else:
@@ -73,36 +73,33 @@ class JSONLoader(UserDict):
             self.cache_dir.mkdir(parents=True)
         super().__init__(*args, **kwargs)
 
-    def get_json_path(self, endpoint) -> Path:
-        return self.cache_dir / f'{endpoint}.json.zip'
+    def get_file_path(self, endpoint) -> Path:
+        return self.cache_dir / f'{endpoint}.pickle'
 
-    def dump_json(self, endpoint: str, data: JSONSerializable) -> None:
-        json_path = self.get_json_path(endpoint)
-        with open(json_path, 'wb') as zipfile:
-            compressed_json = zlib.compress(bytes(json.dumps(data), 'utf-8'))
-            zipfile.write(compressed_json)
+    def dump_dict(self, endpoint: str, data: Dict[str, bytes]) -> None:
+        file_path = self.get_file_path(endpoint)
+        with open(file_path, 'wb') as pickle_file:
+            pickle.dump(data, pickle_file)
 
-    def load_json(self, endpoint: str) -> dict:
-        json_path = self.get_json_path(endpoint)
-        with open(json_path, 'rb') as json_file:
-            compressed_json = json_file.read()
-            if not compressed_json:
+    def load_dict(self, file_path: Path) -> Dict[str, bytes]:
+        with open(file_path, 'rb') as pickle_file:
+            pickle_data = pickle_file.read()
+            if not pickle_data:
                 return {}
-            bin_json = zlib.decompress(compressed_json)
-            return json.loads(bin_json.decode('utf-8'))
+            return pickle.loads(pickle_data)
 
-    def __getitem__(self, endpoint: str) -> JSONSerializable:
+    def __getitem__(self, endpoint: str) -> Dict[str, bytes]:
         if endpoint not in self:
-            json_path = self.get_json_path(endpoint)
-            if json_path.exists():
-                self[endpoint] = self.load_json(endpoint)
+            file_path = self.get_file_path(endpoint)
+            if file_path.exists():
+                self[endpoint] = self.load_dict(file_path)
             else:
                 self[endpoint] = {}
         return super().__getitem__(endpoint)
 
 
-class JSONCache(BaseCache):
-    """A simple cache class that uses JSON files to load each endpoint
+class PickleFileCache(BaseCache):
+    """A simple cache class that uses pickle files to load each endpoint
     cache as they are requested. When an endpoint is requested for the first
     time, the entire endpoint's cache is loaded into memory, so this can get
     quite large quickly.
@@ -110,16 +107,14 @@ class JSONCache(BaseCache):
 
     def __init__(self, cache_dir: Optional[Path] = None, *args,
                  **kwargs) -> None:
-        self._cache_dict = JSONLoader(cache_dir, *args, **kwargs)
+        self._cache_dict = PickleLoader(cache_dir, *args, **kwargs)
 
     def get(self, endpoint: str, resource: str, url: str
             ) -> Union[Dict, List, None]:
         cached_data = self._cache_dict[endpoint].get(make_key(resource, url))
         if cached_data:
-            # Encode UTF-8 str into bytes str then decode base64 bytes
-            serializable_data = base64.b64decode(cached_data.encode('utf-8'))
             # Decompress base64 bytes and decode to UTF-8 string
-            bin_dict = zlib.decompress(serializable_data).decode('utf-8')
+            bin_dict = zlib.decompress(cached_data).decode('utf-8')
             cached_data = json.loads(bin_dict)
         return cached_data
 
@@ -127,9 +122,7 @@ class JSONCache(BaseCache):
             data: JSONSerializable) -> None:
         # Convert JSON str to bytes then compress into bytes
         compressed_data = zlib.compress(bytes(json.dumps(data), 'utf-8'))
-        # Encode bytes into base64 bytes, then decode to UTF-8 str
-        serializable_data = base64.b64encode(compressed_data).decode('utf-8')
-        self._cache_dict[endpoint][make_key(resource, url)] = serializable_data
+        self._cache_dict[endpoint][make_key(resource, url)] = compressed_data
 
     def has(self, endpoint: str, resource: str, url: str) -> bool:
         return make_key(resource, url) in self._cache_dict[endpoint]
@@ -153,7 +146,7 @@ class JSONCache(BaseCache):
 
     def _dump_cache(self) -> None:
         for endpoint in self._cache_dict:
-            self._cache_dict.dump_json(endpoint, self._cache_dict[endpoint])
+            self._cache_dict.dump_dict(endpoint, self._cache_dict[endpoint])
 
 
 def cache_get(get_coro):
@@ -173,7 +166,7 @@ def cache_get(get_coro):
 
 
 if __name__ == '__main__':
-    c = JSONCache()
+    c = PickleFileCache()
     base_url = 'https://woot.com/'
     test_dict = {
         'jdsiofjsdafd': [
