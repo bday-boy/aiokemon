@@ -1,4 +1,3 @@
-import hashlib
 import json
 import pickle
 import zlib
@@ -9,6 +8,8 @@ from pathlib import Path
 import aiokemon.core.common as cmn
 
 JSONSerializable = Union[Dict, List]
+BASE_CACHE_DIR = Path.home() / '.cache' / 'aiokemon'
+empty_zipped_dict = zlib.compress(b'{}')
 
 
 class BaseCache:
@@ -56,7 +57,7 @@ class PickleLoader(UserDict):
     def __init__(self, cache_dir: Optional[Path] = None, *args,
                  **kwargs) -> None:
         if cache_dir is None:
-            self.cache_dir = Path.home() / '.cache' / 'aiokemon'
+            self.cache_dir = BASE_CACHE_DIR / 'pickle_cache'
         elif isinstance(cache_dir, str):
             self.cache_dir = Path(cache_dir)
         else:
@@ -103,10 +104,9 @@ class PickleFileCache(BaseCache):
 
     def get(self, endpoint: str, url: str) -> Union[Dict, List, None]:
         cached_data = self._cache_dict[endpoint].get(url)
-        if cached_data:
-            # Decompress bytes and decode to UTF-8 string
-            bin_dict = zlib.decompress(cached_data).decode('utf-8')
-            cached_data = json.loads(bin_dict)
+        # Decompress bytes and decode to UTF-8 string
+        bin_dict = zlib.decompress(cached_data).decode('utf-8')
+        cached_data = json.loads(bin_dict)
         return cached_data
 
     def put(self, endpoint: str, url: str, data: JSONSerializable) -> None:
