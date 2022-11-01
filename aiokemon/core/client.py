@@ -5,7 +5,7 @@ from aiokemon.core.api import PokeAPIResource, new_pokeapimetadata
 from aiokemon.core.common import Resource
 from aiokemon.endpoints import *
 
-from aiokemon.core.base_client import PokeAPIClientBase
+from aiokemon.core.base_client import PokeAPIClientBase, gather_with_progress
 
 Resource = Union[str, int]
 
@@ -438,12 +438,12 @@ if __name__ == '__main__':
             mons = await session.get_available_resources('pokemon')
             mon_coros = tuple(session.pokemon(res['name'])
                               for res in mons['results'])
-            all_mons = await asyncio.gather(*mon_coros)
+            all_mons = await gather_with_progress(mon_coros)
 
             moves = await session.get_available_resources('move')
             move_coros = tuple(session.move(res['name'])
                                for res in moves['results'])
-            all_moves = await asyncio.gather(*move_coros)
+            all_moves = await gather_with_progress(move_coros)
 
             a = 0
 

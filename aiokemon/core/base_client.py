@@ -1,12 +1,41 @@
+import asyncio
 import json
 from types import TracebackType
-from typing import Dict, List, Optional, Type, Union
+from typing import Any, Awaitable, Dict, Iterable, List, Optional, Type, Union
 
 from aiohttp import ClientSession
 
 import aiokemon.core.common as cmn
 from aiokemon.core.cache import cache_get, EmptyCache, PickleFileCache
 from aiokemon.core.matcher import ResourceMatcher
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = None
+
+
+async def gather_with_progress(awaitables: Iterable[Awaitable],
+                               desc: Optional[str] = None) -> List[Any]:
+    """Wraps asyncio.as_completed in a tqdm constructor so progress gets
+    printed to stdout.
+    """
+    if tqdm is None:
+        raise NameError(
+            'Module "tqdm" is not available. Please install if you would like '
+            'to use gather_with_progress.'
+        )
+    try:
+        num_awaitables = len(awaitables)
+    except:
+        num_awaitables = None
+    progress_iter = tqdm(
+        asyncio.as_completed(awaitables),
+        total=num_awaitables,
+        desc=desc or 'Gathering PokéAPI data...',
+        ascii=True
+    )
+    return [await awaitable for awaitable in progress_iter]
 
 
 class PokeAPIClientBase:
@@ -88,19 +117,17 @@ class PokeAPIClientBase:
 
 
 if __name__ == '__main__':
-    import asyncio
-
     async def test():
         async with PokeAPIClientBase() as session:
             mons = await session._get_json('pokemon', querystring='limit=10000')
             mon_coros = tuple(session._get_json('pokemon', res['name'])
                               for res in mons['results'])
-            await asyncio.gather(*mon_coros)
+            await gather_with_progress(mon_coros)
 
             moves = await session._get_json('move', querystring='limit=100000')
             move_coros = tuple(session._get_json('move', res['name'])
                                for res in moves['results'])
-            await asyncio.gather(*move_coros)
+            await gather_with_progress(move_coros)
 
             a = 0
 
