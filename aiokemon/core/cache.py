@@ -102,20 +102,18 @@ class PickleFileCache(BaseCache):
                  **kwargs) -> None:
         self._cache_dict = PickleLoader(cache_dir, *args, **kwargs)
 
-    def get(self, endpoint: str, url: str) -> Union[Dict, List, None]:
-        cached_data = self._cache_dict[endpoint].get(url)
+    def get(self, endpoint: str, key: str) -> Union[Dict, List, None]:
+        cached_data = self._cache_dict[endpoint].get(key)
         # Decompress bytes and decode to UTF-8 string
-        bin_dict = zlib.decompress(cached_data).decode('utf-8')
-        cached_data = json.loads(bin_dict)
-        return cached_data
+        return zlib.decompress(cached_data).decode('utf-8')
 
-    def put(self, endpoint: str, url: str, data: JSONSerializable) -> None:
+    def put(self, endpoint: str, key: str, data: str) -> None:
         # Convert JSON str to bytes then compress into bytes
-        compressed_data = zlib.compress(bytes(json.dumps(data), 'utf-8'))
-        self._cache_dict[endpoint][url] = compressed_data
+        compressed_data = zlib.compress(bytes(data, 'utf-8'))
+        self._cache_dict[endpoint][key] = compressed_data
 
-    def has(self, endpoint: str, url: str) -> bool:
-        return url in self._cache_dict[endpoint]
+    def has(self, endpoint: str, key: str) -> bool:
+        return key in self._cache_dict[endpoint]
 
     def safe_dump(self) -> None:
         print('Dumping cache...')
@@ -142,8 +140,11 @@ class PickleFileCache(BaseCache):
 def cache_get(get_coro):
     async def cache_wrapper(session, endpoint: str,
                             resource: Optional[str] = None,
-                            querystring: Optional[str] = None):
-        url = cmn.join_url(endpoint, resource, query=querystring)
+                            querystring: Optional[str] = None,
+                            url: Optional[str] = None
+                            ) -> Union[Dict, List, None]:
+        if url is None:
+            url = cmn.join_url(endpoint, resource, query=querystring)
         if session._cache.has(endpoint, url):
             return session._cache.get(endpoint, url)
         json_data = await get_coro(
