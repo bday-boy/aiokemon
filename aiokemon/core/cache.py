@@ -11,14 +11,6 @@ import aiokemon.core.common as cmn
 JSONSerializable = Union[Dict, List]
 
 
-def make_key(resource: str, url: str) -> str:
-    """Since URLs contain an abundance of characters unsafe for use in
-    filenames, the keys used for each endpoint dict are the hashed URL
-    appended to the requested resource.
-    """
-    return f'{resource}{hashlib.md5(bytes(url, "utf-8")).hexdigest()}'
-
-
 class BaseCache:
     """Base class to be used for user-created caches. Any cache class that
     inherits this class must implement the following methods:
@@ -109,23 +101,21 @@ class PickleFileCache(BaseCache):
                  **kwargs) -> None:
         self._cache_dict = PickleLoader(cache_dir, *args, **kwargs)
 
-    def get(self, endpoint: str, resource: str, url: str
-            ) -> Union[Dict, List, None]:
-        cached_data = self._cache_dict[endpoint].get(make_key(resource, url))
+    def get(self, endpoint: str, url: str) -> Union[Dict, List, None]:
+        cached_data = self._cache_dict[endpoint].get(url)
         if cached_data:
-            # Decompress base64 bytes and decode to UTF-8 string
+            # Decompress bytes and decode to UTF-8 string
             bin_dict = zlib.decompress(cached_data).decode('utf-8')
             cached_data = json.loads(bin_dict)
         return cached_data
 
-    def put(self, endpoint: str, resource: str, url: str,
-            data: JSONSerializable) -> None:
+    def put(self, endpoint: str, url: str, data: JSONSerializable) -> None:
         # Convert JSON str to bytes then compress into bytes
         compressed_data = zlib.compress(bytes(json.dumps(data), 'utf-8'))
-        self._cache_dict[endpoint][make_key(resource, url)] = compressed_data
+        self._cache_dict[endpoint][url] = compressed_data
 
-    def has(self, endpoint: str, resource: str, url: str) -> bool:
-        return make_key(resource, url) in self._cache_dict[endpoint]
+    def has(self, endpoint: str, url: str) -> bool:
+        return url in self._cache_dict[endpoint]
 
     def safe_dump(self) -> None:
         print('Dumping cache...')
@@ -154,12 +144,12 @@ def cache_get(get_coro):
                             resource: Optional[str] = None,
                             querystring: Optional[str] = None):
         url = cmn.join_url(endpoint, resource, query=querystring)
-        if session._cache.has(endpoint, resource, url):
-            return session._cache.get(endpoint, resource, url)
+        if session._cache.has(endpoint, url):
+            return session._cache.get(endpoint, url)
         json_data = await get_coro(
             session, endpoint, resource, querystring
         )
-        session._cache.put(endpoint, resource, url, json_data)
+        session._cache.put(endpoint, url, json_data)
         return json_data
 
     return cache_wrapper
