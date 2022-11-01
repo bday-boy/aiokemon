@@ -1,4 +1,3 @@
-import json
 import pickle
 import zlib
 from collections import UserDict
@@ -9,7 +8,6 @@ import aiokemon.core.common as cmn
 
 JSONSerializable = Union[Dict, List]
 BASE_CACHE_DIR = Path.home() / '.cache' / 'aiokemon'
-empty_zipped_dict = zlib.compress(b'{}')
 
 
 class BaseCache:

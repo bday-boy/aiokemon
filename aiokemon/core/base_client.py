@@ -10,6 +10,10 @@ from aiokemon.core.matcher import ResourceMatcher
 
 
 class PokeAPIClientBase:
+    """Base session manager for PokéAPI. Pokeapi.co requires client-side
+    caching, so a cache is recommended. PickleFileCache is used by default.
+    """
+
     def __init__(self, session: Optional[ClientSession] = None, *,
                  match: bool = True, cache=None, should_cache: bool = True
                  ) -> None:

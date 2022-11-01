@@ -14,8 +14,7 @@ class ResourceMatcher:
     """
 
     def __init__(self) -> None:
-        self.cache = {}
-        self.loaded_endpoints = {}
+        self._loaded_endpoints = {}
 
     async def _load_endpoint(self, endpoint: str, session):
         """If an endpoint doesn't exist in the endpoint_resources dict, it is
@@ -26,10 +25,10 @@ class ResourceMatcher:
         """
         results = await session.get_available_resources(endpoint)
         resource_names = {res['name'] for res in results.get('results', [])}
-        self.loaded_endpoints[endpoint] = resource_names
+        self._loaded_endpoints[endpoint] = resource_names
 
     def _validate_endpoint(self, endpoint: str) -> None:
-        """Validates a given endpoint and resource.
+        """Validates a given endpoint.
 
         ## Raises
         `ValueError` if the endpoint is invalid.
@@ -52,17 +51,17 @@ class ResourceMatcher:
         """Computes string distance between the search and the actual endpoint
         for each resource in the endpoint and adds it to the matches list.
         """
-        for resource in self.loaded_endpoints[endpoint]:
+        for resource in self._loaded_endpoints[endpoint]:
             matches.append((resource, levenshtein_osa(resource, search)))
 
     async def best_match(self, endpoint: str, resource: str, session) -> str:
         """Finds the best match for a given resource of a given endpoint."""
         self._validate_endpoint(endpoint)
-        if endpoint not in self.loaded_endpoints:
+        if endpoint not in self._loaded_endpoints:
             await self._load_endpoint(endpoint, session)
 
         # Don't need to bother searching if it's an exact match
-        if resource in self.loaded_endpoints[endpoint]:
+        if resource in self._loaded_endpoints[endpoint]:
             return resource
 
         matches = []
