@@ -1,3 +1,4 @@
+import json
 from typing import Optional, Union
 
 import aiokemon.core.common as cmn
@@ -27,7 +28,7 @@ class PokeAPIClient(PokeAPIClientBase):
         - The endpoint or resource is invalid
         - Both the resource and querystring have a value (only one should)
         """
-        pokeapi_data = await self._get(endpoint, resource, querystring)
+        pokeapi_data = await self._get_json(endpoint, resource, querystring)
         return PokeAPIResource(endpoint, pokeapi_data)
 
     async def berry(self, resource: Resource) -> Berry:
@@ -351,9 +352,11 @@ class PokeAPIClient(PokeAPIClientBase):
         information.
         """
         pkmn = await self.get_resource('pokemon', resource)
-        pokeapi_data = await self._get_json(pkmn.location_area_encounters)
+        pokeapi_data = await self._get_response_text(
+            pkmn.location_area_encounters
+        )
         pkmn.location_area_encounters = new_pokeapimetadata(
-            'location_area_encounters', pokeapi_data
+            'location_area_encounters', json.loads(pokeapi_data)
         )
         return pkmn
 
@@ -396,9 +399,9 @@ class PokeAPIClient(PokeAPIClientBase):
         detailed information.
         """
         pkmn = await self.get_resource('pokemon-species', resource)
-        pokeapi_data = await self._get_json(pkmn.evolution_chain)
+        pokeapi_data = await self._get_response_text(pkmn.evolution_chain)
         pkmn.evolution_chain = new_pokeapimetadata(
-            'evolution_chain', pokeapi_data
+            'evolution_chain', json.loads(pokeapi_data)
         )
         return pkmn
 

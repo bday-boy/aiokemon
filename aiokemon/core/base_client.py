@@ -1,3 +1,4 @@
+import json
 from types import TracebackType
 from typing import Dict, List, Optional, Type, Union
 
@@ -26,14 +27,28 @@ class PokeAPIClientBase:
         self._cache.safe_dump()
 
     @cache_get
-    async def _get(self, endpoint: str, resource: Optional[str] = None,
-                   querystring: Optional[str] = None) -> Union[Dict, List]:
+    async def _get_response_text(self, endpoint: str,
+                                 resource: Optional[str] = None,
+                                 querystring: Optional[str] = None,
+                                 url: Optional[str] = None
+                                 ) -> str:
+        """Queries the PokeAPI server and returns the response text."""
+        if url is None:
+            url = cmn.join_url(endpoint, resource, query=querystring)
+        async with self._session.get(url) as response:
+            response.raise_for_status()
+            response_text = await response.text()
+        return response_text
+
+    async def _get_json(self, endpoint: str, resource: Optional[str] = None,
+                        querystring: Optional[str] = None
+                        ) -> Union[Dict, List]:
         """Joins the base URL, the endpoint, the resource, and the querystring
         together, then asynchronously sends a GET request for it.
 
         ## Raises
         `ValueError` if:
-        - The endpoint or resource is invalid
+        - The endpoint is invalid
         - Both the resource and querystring have a value (only one should)
         """
         if resource and querystring:
@@ -43,22 +58,18 @@ class PokeAPIClientBase:
         if self._matcher is not None and isinstance(resource, str):
             resource = await self._matcher.best_match(endpoint, resource, self)
         url = cmn.join_url(endpoint, resource, query=querystring)
-        json_data = await self._get_json(url)
+        response_text = await self._get_response_text(endpoint, resource)
+        json_data = json.loads(response_text)
         if isinstance(json_data, dict):
             json_data['url'] = url
         return json_data
 
-    async def _get_json(self, url: str) -> Union[Dict, List]:
-        """Queries the PokeAPI server and returns the JSON response."""
-        async with self._session.get(url) as response:
-            response.raise_for_status()
-            json_data = await response.json()
-        return json_data
-
     async def get_available_resources(self, endpoint: str) -> dict:
         """Queries an endpoint for all its existing resources."""
-        url = cmn.join_url(endpoint, query='limit=100000')
-        return await self._get_json(url)
+        response_text = await self._get_response_text(
+            endpoint, querystring='limit=100000'
+        )
+        return json.loads(response_text)
 
     async def __aenter__(self) -> 'PokeAPIClientBase':
         return self
@@ -77,13 +88,13 @@ if __name__ == '__main__':
 
     async def test():
         async with PokeAPIClientBase() as session:
-            mons = await session._get('pokemon', querystring='limit=10000')
-            mon_coros = tuple(session._get('pokemon', res['name'])
+            mons = await session._get_json('pokemon', querystring='limit=10000')
+            mon_coros = tuple(session._get_json('pokemon', res['name'])
                               for res in mons['results'])
             await asyncio.gather(*mon_coros)
 
-            moves = await session._get('move', querystring='limit=100000')
-            move_coros = tuple(session._get('move', res['name'])
+            moves = await session._get_json('move', querystring='limit=100000')
+            move_coros = tuple(session._get_json('move', res['name'])
                                for res in moves['results'])
             await asyncio.gather(*move_coros)
 
@@ -91,11 +102,11 @@ if __name__ == '__main__':
 
     async def test_matcher():
         async with PokeAPIClientBase() as session:
-            await session._get('pokemon', 'brelom')
-            await session._get('pokemon', 'drilfoon')
-            await session._get('pokemon', 'vileplume')
-            await session._get('pokemon', 'bouldore')
-            await session._get('pokemon', 'garchom')
+            await session._get_json('pokemon', 'brelom')
+            await session._get_json('pokemon', 'drilfoon')
+            await session._get_json('pokemon', 'vileplume')
+            await session._get_json('pokemon', 'bouldore')
+            await session._get_json('pokemon', 'garchom')
             b = 0
 
     asyncio.run(test())
