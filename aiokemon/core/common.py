@@ -57,13 +57,13 @@ Resource = Union[str, int]
 backslashes = re.compile(r'/+')
 
 
-def join_url(*url_parts: str, query: Optional[str] = None) -> str:
+def join_url(*url_parts: str, querystring: Optional[str] = None) -> str:
     """Returns a URL by stripping the components of trailing forward slashes
     and then joining them with forward slashes. Ignores falsy parts.
     """
     url = BASE_URL + '/'.join(part.strip('/') for part in url_parts if part)
-    if query:
-        url += '?' + query.lstrip('?')
+    if querystring:
+        url += '?' + querystring.lstrip('?')
     return url
 
 
