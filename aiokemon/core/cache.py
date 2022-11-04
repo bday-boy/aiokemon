@@ -1,7 +1,7 @@
 import pickle
 import zlib
 from collections import UserDict
-from typing import Dict, List, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 from pathlib import Path
 
 import aiokemon.core.common as cmn
@@ -20,6 +20,8 @@ class BaseCache:
     - `has(endpoint: str, resource: str, url: str)`: Checks if the data exists
     in the cache.
     """
+    def __init__(self) -> None:
+        self._has_changed = False
 
     def get(self, *args, **kwargs) -> Union[JSONSerializable, None]:
         raise NotImplementedError('Cache needs a `get` method to work.')
@@ -94,10 +96,13 @@ class PickleFileCache(BaseCache):
     cache as they are requested. When an endpoint is requested for the first
     time, the entire endpoint's cache is loaded into memory, so this can get
     quite large quickly.
+
+    TODO: Make cache _has_changed tracker apply to each endpoint.
     """
 
     def __init__(self, cache_dir: Optional[Path] = None, *args,
                  **kwargs) -> None:
+        super().__init__()
         self._cache_dict = PickleLoader(cache_dir, *args, **kwargs)
 
     def get(self, endpoint: str, key: str) -> Union[Dict, List, None]:
@@ -109,18 +114,22 @@ class PickleFileCache(BaseCache):
         # Convert JSON str to bytes then compress into bytes
         compressed_data = zlib.compress(bytes(data, 'utf-8'))
         self._cache_dict[endpoint][key] = compressed_data
+        self._has_changed = True
 
     def has(self, endpoint: str, key: str) -> bool:
         return key in self._cache_dict[endpoint]
 
     def safe_dump(self) -> None:
+        if not self._has_changed:
+            return
         print('Dumping cache...')
         try:
             self._dump_cache()
+            print('Cache dumped.')
         except NameError as e:
             if "name 'open' is not defined" in e.args:
                 raise RuntimeError(
-                    "Couldn't dump cache at all. Python raised an exception "
+                    "Couldn't dump cache. Python raised an exception "
                     'before the cache was dumped and the open() function from '
                     "Python's standard library was deleted from the global "
                     'namespace before the cache got a chance to dump into a '
@@ -128,14 +137,13 @@ class PickleFileCache(BaseCache):
                     'you can manually dump the cache at any point by calling'
                     'the safe_dump function.'
                 )
-        print('Cache dumped.')
 
     def _dump_cache(self) -> None:
         for endpoint in self._cache_dict:
             self._cache_dict.dump_dict(endpoint, self._cache_dict[endpoint])
 
 
-def cache_get(get_coro):
+def cache_get(get_coro: Callable[..., Coroutine[Any, None, str]]):
     async def cache_wrapper(session, endpoint: str,
                             resource: Optional[str] = None,
                             querystring: Optional[str] = None,
